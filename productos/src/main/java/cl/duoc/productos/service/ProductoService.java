@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import cl.duoc.productos.dto.ProductoRequest;
 import cl.duoc.productos.dto.ProductoResponse;
+import cl.duoc.productos.dto.ProductoUpdateRequest;
 import cl.duoc.productos.exception.ConflictException;
 import cl.duoc.productos.mapper.ProductoMapper;
 import cl.duoc.productos.model.Producto;
@@ -40,6 +41,14 @@ public class ProductoService {
         return productoMapper.toResponse(producto);
     }
 
+    //Buscar por nombrep
+    public ProductoResponse buscarProductoPorNombre(String nombrep) {
+        log.info("Buscando producto por nombre: {}", nombrep);
+        Producto producto = productoRepository.findByNombrep(nombrep)
+                .orElseThrow(() -> new NoSuchElementException("Producto no encontrado"));
+        return productoMapper.toResponse(producto);
+    }
+
     //Crear nuevo producto
     public ProductoResponse crearProducto(ProductoRequest request){
         log.info("Creando producto con nombre: {}", request.getNombrep());
@@ -54,7 +63,8 @@ public class ProductoService {
     }
 
     //Actualiza datos de un producto
-    public ProductoResponse actualizarProducto(Long id, ProductoRequest request) {
+    //ProductoRequest por ProductoUpdateRequest 
+    public ProductoResponse actualizarProducto(Long id, ProductoUpdateRequest request) {
         log.info("Actualizando producto con ID: {}", id);
         
         Producto producto = productoRepository.findById(id)
