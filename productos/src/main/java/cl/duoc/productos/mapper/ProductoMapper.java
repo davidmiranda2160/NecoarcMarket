@@ -15,13 +15,20 @@ public class ProductoMapper {
                 .precio(request.getPrecio())
                 .stock(request.getStock())
                 .categoria(request.getCategoria())
-                .activo(request.getActivo())
                 .vendedorId(request.getVendedorId())
+                .activo(true)
                 .build();
     }
 public ProductoResponse toResponse(Producto producto){
+    return ProductoResponse.builder()
     .id(producto.getId())
     .nombrep(producto.getNombrep())
+    .descripcion(producto.getDescripcion())
+    .precio(producto.getPrecio())
+    .stock(producto.getStock())
+    .categoria(producto.getCategoria())
+    .vendedorId(producto.getVendedorId())
+    .build();
     
 }
 

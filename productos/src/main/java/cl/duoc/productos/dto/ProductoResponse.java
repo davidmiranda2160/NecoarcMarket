@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ProductoResponse {
-    private Long od;
+    private Long id;
     private String nombrep;
     private String descripcion;
     private BigDecimal precio;

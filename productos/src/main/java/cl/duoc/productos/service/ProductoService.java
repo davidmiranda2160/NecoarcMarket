@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import cl.duoc.productos.dto.ProductoRequest;
 import cl.duoc.productos.dto.ProductoResponse;
+import cl.duoc.productos.exception.ConflictException;
 import cl.duoc.productos.mapper.ProductoMapper;
 import cl.duoc.productos.model.Producto;
 import cl.duoc.productos.repository.ProductoRepository;
@@ -23,7 +24,7 @@ public class ProductoService {
 
     @Autowired
     private ProductoMapper productoMapper;
-
+//Debo poner el cliente
     //Busca todos los productos disponibles
     public List<Producto> buscarProductos(){
         log.info("Buscando todos los productos");
@@ -42,7 +43,7 @@ public class ProductoService {
     //Crear nuevo producto
     public ProductoResponse crearProducto(ProductoRequest request){
         log.info("Creando producto con nombre: {}", request.getNombrep());
-        if(productoRepository.existByNombrep(request.getNombrep())){
+        if(productoRepository.existsByNombrep(request.getNombrep())){
             throw new ConflictException("El nombre del producto ya existe");
         }
         Producto producto = productoMapper.fromRequest(request);
