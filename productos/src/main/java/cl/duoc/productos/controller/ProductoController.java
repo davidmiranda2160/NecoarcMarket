@@ -71,7 +71,7 @@ public class ProductoController {
         return ResponseEntity.noContent().build();
     }
 
-    //Acá queda agregar endpoint para vincular productos con usuario
+   
 
 
 }

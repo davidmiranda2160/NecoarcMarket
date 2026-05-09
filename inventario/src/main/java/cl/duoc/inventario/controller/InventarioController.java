@@ -3,6 +3,8 @@ package cl.duoc.inventario.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,12 @@ public class InventarioController {
         return ResponseEntity.ok(inventarioService.agregarStock(request.getProductoId(), request.getCantidad()));
 
     }
-    //Conexion microservicio pedidos para descontar
+
+    @GetMapping("/producto/{productoId}")
+public ResponseEntity<InventarioResponse> obtenerStock(@PathVariable Long productoId) {
+    log.info("API GET: Consultando stock del producto {}", productoId);
+    return ResponseEntity.ok(inventarioService.obtenerStockPorProducto(productoId));
+}
+    //Conexion microservicio pedidos para descontar, lo voy a añadir cuando hayan más microservicios por si hay que vincular la venta de usuario vendedor o vincularla a cliente
     //
 }

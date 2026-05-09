@@ -25,7 +25,8 @@ public class ProductoClient {
         log.info("Llamando al microservicio de Productos para el ID: {}", id);
         try {
             return webClient.get()
-                    .uri("/{id}", id) // Suponiendo que GET /api/v1/productos/{id} existe
+                    //Revisar bien la asignacion del endpoint o me va a cargar la verga
+                    .uri("/{id}", id) 
                     .retrieve()
                     .bodyToMono(ProductoResponse.class)
                     .block();
