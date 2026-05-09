@@ -1,0 +1,31 @@
+package cl.duoc.inventario.controller;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import cl.duoc.inventario.dto.InventarioRequest;
+import cl.duoc.inventario.dto.InventarioResponse;
+import cl.duoc.inventario.service.InventarioService;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+
+@RestController
+@RequestMapping("/v1/inventario")
+@Slf4j
+public class InventarioController {
+    @Autowired
+    private InventarioService inventarioService;
+
+    @PostMapping("/abastecer")
+    public ResponseEntity<InventarioResponse> abastecer(@Valid @RequestBody InventarioRequest request){
+        return ResponseEntity.ok(inventarioService.agregarStock(request.getProductoId(), request.getCantidad()));
+
+    }
+    //Conexion microservicio pedidos para descontar
+    //
+}

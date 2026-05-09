@@ -3,6 +3,8 @@ package cl.duoc.productos.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cl.duoc.productos.client.InventarioClient;
+import cl.duoc.productos.dto.InventarioResponse;
 import cl.duoc.productos.dto.ProductoRequest;
 import cl.duoc.productos.dto.ProductoResponse;
 import cl.duoc.productos.dto.ProductoUpdateRequest;
@@ -25,7 +27,9 @@ public class ProductoService {
 
     @Autowired
     private ProductoMapper productoMapper;
-//Debo poner el cliente
+
+    @Autowired
+    private InventarioClient inventarioClient;
     //Busca todos los productos disponibles
     public List<Producto> buscarProductos(){
         log.info("Buscando todos los productos");
@@ -93,8 +97,23 @@ public class ProductoService {
         }   
 
 
+//Agregar lo del inventarioClient o algo así
+public ProductoResponse buscarProductoConStock(Long id) {
+    log.info("Buscando producto e inventario para ID: {}", id);
+    Producto producto = productoRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Producto no encontrado en NecoarcMarket"));
+    try {
+        InventarioResponse inventario = inventarioClient.obtenerStockPorProducto(id);
+        
+        ProductoResponse response = productoMapper.toResponse(producto);
+        response.setStock(inventario.getCantidad()); 
+        return response;
 
-
+    } catch (Exception e) {
+        log.error("No se pudo obtener el stock para el producto {}, se retornará solo info básica", id);
+        return productoMapper.toResponse(producto);
+    }
+}
 
 
 
