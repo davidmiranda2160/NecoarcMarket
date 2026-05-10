@@ -1,0 +1,31 @@
+package cl.duoc.busqueda.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import cl.duoc.busqueda.dto.BusquedaResponse;
+import cl.duoc.busqueda.service.BusquedaService;
+import lombok.extern.slf4j.Slf4j;
+
+@RestController
+@RequestMapping("/v1/busqueda")
+@Slf4j
+public class BusquedaController {
+/*
+    @Autowired
+    private BusquedaService busquedaService;
+
+    @GetMapping("/rastrear/{codigo}")
+    public ResponseEntity<BusquedaResponse> rastrearPedido(@PathVariable String codigo) {
+        log.info("Iniciando búsqueda de seguimiento para el código: {}", codigo);
+        
+        BusquedaResponse respuesta = busquedaService.obtenerSeguimientoCompleto(codigo);
+        
+        return ResponseEntity.ok(respuesta);
+    }
+    */
+}

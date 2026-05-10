@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import cl.duoc.inventario.client.ProductoClient;
 import cl.duoc.inventario.dto.InventarioResponse;
+import cl.duoc.inventario.dto.ProductoDetalleDTO;
+import cl.duoc.inventario.dto.ProductoResponse;
 import cl.duoc.inventario.exception.ConflictException;
 import cl.duoc.inventario.mapper.InventarioMapper;
 import cl.duoc.inventario.model.Inventario;
@@ -65,6 +67,20 @@ public class InventarioService {
         return inventarioRepository.findByProductoId(productoId)
                 .map(inv -> inv.getCantidad() >= cantidadRequerida)
                 .orElse(false);
+    }
+    //obtener el id para mostrar el nombre en postman (quitar spring security)
+    //Limpie productodto para usar el productoresponse
+    public ProductoDetalleDTO obtenerDetalleCompleto(Long id) {
+
+        Inventario inv = inventarioRepository.findByProductoId(id)
+                .orElseThrow(() -> new NoSuchElementException("El producto no tiene registro en el inventario"));
+        ProductoResponse prod = productoClient.obtenerProductoPorId(id);
+        ProductoDetalleDTO dto = new ProductoDetalleDTO();
+        dto.setProductoId(id);
+        dto.setNombre(prod.getNombrep()); 
+        dto.setCantidad(inv.getCantidad());
+        
+        return dto;
     }
 
 }
