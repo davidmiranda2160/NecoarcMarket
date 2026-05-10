@@ -9,7 +9,7 @@ import cl.duoc.busqueda.dto.EnvioDTO;
 
 @Service
 public class BusquedaService {
-   /*  @Autowired
+    @Autowired
     private EnvioClient enviosClient;
 
     public BusquedaResponse obtenerSeguimientoCompleto(String codigo) {
@@ -23,5 +23,5 @@ public class BusquedaService {
         
         return res;
     }
-    */
+    //Nota importante, esperar a que david finalice Envio para poder arreglar EnvioCliente de Busqueda, así reparo BusquedaService
 }
