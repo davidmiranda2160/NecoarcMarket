@@ -1,4 +1,6 @@
-package cl.duoc.carrito.model;
+package cl.duoc.ordenes.model;
+
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,25 +15,30 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name= "carrito")
-@Builder
+@Table(name= "ordenes")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Carrito {
+@Builder
+public class Ordenes {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long idUsuario; 
-
-    @Column(nullable = false)
-    private Long idProducto; 
+    @Column(nullable= false)
+    private Long idUsuario;
 
     @Column(nullable= false)
-    private int cantidad;
+    private Date fechaCreacion;
 
     @Column(nullable= false)
-    private int montoTotal;
+    private String estadoOrden;
 
+    @Column(nullable= false)
+    private double montoTotal;
+
+    @Column(nullable= false)
+    private String direccionEnvio;
+
+    @Column(nullable= false)
+    private Long idPago;
 }

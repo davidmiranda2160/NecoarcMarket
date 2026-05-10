@@ -1,4 +1,4 @@
-package cl.duoc.pagos.config;
+package cl.duoc.usuario.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -7,9 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class WebClientConfig {
-
-//Se deja configurado el webClient para mas tarde 
-    @Value("${services.ordenes.baseUrl}")
+    @Value("${services.usuario.baseUrl}")
     private String baseUrl;
 
     @Bean
@@ -18,4 +16,5 @@ public class WebClientConfig {
                 .baseUrl(baseUrl)
                 .build();
     }
+
 }
