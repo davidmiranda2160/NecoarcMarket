@@ -1,21 +1,22 @@
 package cl.duoc.productos.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.beans.factory.annotation.Value;
 
 
-
-//Acá cuando se terminen los otros microservicios para vincular los que se necesiten
+@Configuration
 public class WebClientConfig {
-        @Value("${services.inventario.baseUrl}")
-    private String baseUrl;
+
+    @Value("${services.inventario.baseUrl}")
+    private String inventarioBaseUrl;
 
     @Bean
     public WebClient webClient() {
+    
         return WebClient.builder()
-                .baseUrl(baseUrl)
+                .baseUrl(inventarioBaseUrl)
                 .build();
     }
 }
