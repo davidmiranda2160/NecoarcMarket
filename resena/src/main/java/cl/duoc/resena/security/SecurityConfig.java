@@ -16,8 +16,12 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) //para dejar preguntar postmancito
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/v1/**").permitAll() //para pruebas, de ahí lo quito o directamente no usaría spring security, hay que verlo
-                .anyRequest().authenticated()
+                .requestMatchers("/v1").permitAll()
+                .anyRequest().permitAll()
+                
             );
         return http.build();
     }
+    
+
 }
