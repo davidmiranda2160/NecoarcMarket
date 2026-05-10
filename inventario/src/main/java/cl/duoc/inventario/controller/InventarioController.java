@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cl.duoc.inventario.dto.InventarioRequest;
 import cl.duoc.inventario.dto.InventarioResponse;
+import cl.duoc.inventario.dto.ProductoDetalleDTO;
 import cl.duoc.inventario.service.InventarioService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +30,14 @@ public class InventarioController {
 
     }
 
-    @GetMapping("/producto/{productoId}")
-public ResponseEntity<InventarioResponse> obtenerStock(@PathVariable Long productoId) {
-    log.info("API GET: Consultando stock del producto {}", productoId);
-    return ResponseEntity.ok(inventarioService.obtenerStockPorProducto(productoId));
-}
-    //Conexion microservicio pedidos para descontar, lo voy a añadir cuando hayan más microservicios por si hay que vincular la venta de usuario vendedor o vincularla a cliente
-    //
+   /* @GetMapping("/producto/{productoId}")
+    public ResponseEntity<InventarioResponse> obtenerStock(@PathVariable Long productoId) {
+        log.info("API GET: Consultando stock del producto {}", productoId);
+        return ResponseEntity.ok(inventarioService.obtenerStockPorProducto(productoId));
+    }*/
+    @GetMapping("/producto/{id}")
+    public ResponseEntity<ProductoDetalleDTO> obtenerDetalleCompleto(@PathVariable Long id){
+        ProductoDetalleDTO detalle = inventarioService.obtenerDetalleCompleto(id);
+        return ResponseEntity.ok(detalle);
+    }
 }
