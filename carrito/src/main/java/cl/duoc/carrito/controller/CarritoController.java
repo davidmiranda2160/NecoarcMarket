@@ -31,16 +31,19 @@ public class CarritoController {
     return carritoService.obtenerCarritoPorUsuario(id);
     }
 
-    @PostMapping
-    public ResponseEntity<CarritoResponse> agregarProducto(@Valid @RequestBody CarritoRequest request) {
+    @PostMapping("/{idUsuario}/{idProducto}")
+    public ResponseEntity<CarritoResponse> agregarProducto(@PathVariable Long idUsuario,
+        @PathVariable Long idProducto,
+        @Valid @RequestBody CarritoRequest request) {
         log.info("");
-        return ResponseEntity.status(HttpStatus.CREATED).body(carritoService.agregarProducto(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(carritoService.agregarProducto(request, idUsuario, idProducto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CarritoResponse> actualizarPaciente(@PathVariable Long id,
-        @Valid @RequestBody CarritoRequest request) {
-        log.info("", id);
+    public ResponseEntity<CarritoResponse> actualizarCliente(@PathVariable Long id,
+        @Valid 
+        @RequestBody CarritoRequest request) {
+        log.info("Sea actualizado el item del carrito: ", id);
         return ResponseEntity
         .ok()
         .body(carritoService.actualizarCantidad(id, request.getCantidad(), request.getMontoTotal()));
