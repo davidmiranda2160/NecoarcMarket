@@ -3,9 +3,9 @@ package cl.duoc.busqueda.client;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@Component
+/*@Component
 public class EnvioClient {
-  /*   private final WebClient webClient;
+    private final WebClient webClient;
 
     public EnviosClient(WebClient.Builder webClientBuilder, 
                         @Value("${services.envios.url}") String url) {
@@ -19,5 +19,5 @@ public class EnvioClient {
                 .bodyToMono(EnvioDTO.class)
                 .block(); 
     }
-                */
-}
+             
+} */   
