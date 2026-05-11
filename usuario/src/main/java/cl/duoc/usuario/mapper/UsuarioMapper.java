@@ -22,6 +22,7 @@ public class UsuarioMapper {
 
     public UsuarioResponse toResponse(Usuario usuario) {
         return UsuarioResponse.builder()
+                .id(usuario.getId())
                 .nombre(usuario.getNombre())
                 .apellidos(usuario.getApellidos())
                 .direccion(usuario.getDireccion())

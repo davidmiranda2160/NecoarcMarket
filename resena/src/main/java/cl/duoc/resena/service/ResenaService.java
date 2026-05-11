@@ -12,9 +12,11 @@ import cl.duoc.resena.dto.ResenaResponse;
 import cl.duoc.resena.mapper.ResenaMapper;
 import cl.duoc.resena.model.Resena;
 import cl.duoc.resena.repository.ResenaRepository;
+import lombok.extern.slf4j.Slf4j;
 import cl.duoc.resena.dto.UsuarioResponse; 
 
 @Service
+@Slf4j
 public class ResenaService {
 
     @Autowired
@@ -46,13 +48,18 @@ public class ResenaService {
                 .collect(Collectors.toList());
     }
 
-
+    //Tanto problema y solo era el null de la fecha
     private String obtenerNombreDeDavid(Long usuarioId) {
         try {
             UsuarioResponse user = usuarioClient.obtenerDatosUsuario(usuarioId);
-            return (user != null) ? user.getNombre() + " " + user.getApellidos() : "Usuario Desconocido";
+            if (user == null || user.getNombre() == null) {
+                log.warn("El micro de Usuarios devolvió un usuario nulo o sin nombre para el ID: {}", usuarioId);
+                return "Usuario Desconocido";
+            }
+            return user.getNombre() + " " + (user.getApellidos() != null ? user.getApellidos() : "");
         } catch (Exception e) {
-            return "Servicio de Usuarios no disponible";
+            log.error("Error crítico al intentar obtener nombre de David: {}", e.getMessage());
+            return "Servicio no disponible";
         }
     }
 }
