@@ -1,15 +1,34 @@
 package cl.duoc.busqueda.mapper;
 
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
 import cl.duoc.busqueda.dto.BusquedaRequest;
 import cl.duoc.busqueda.dto.BusquedaResponse;
-import cl.duoc.busqueda.dto.EnvioResponse;
 import cl.duoc.busqueda.model.Busqueda;
 
 //Mapper automatico, veamos si no explota en mil pedazos
-@Mapper(componentModel = "spring")
-public interface BusquedaMapper {
-    BusquedaResponse toResponse(EnvioResponse envio);
 
+@Component
+public class BusquedaMapper {
+    public Busqueda fromRequest(BusquedaRequest request){
+        return Busqueda.builder()
+                .codigoSeguimiento(request.getCodigoSeguimiento())
+                .estadoEnvio(request.getEstadoEnvio())
+                .detalle(request.getDetalle())
+                .fechaActualizacionProducto(java.time.LocalDateTime.now())
+                .build();
+    }
+    public BusquedaResponse toResponse(Busqueda busqueda, String nombre){
+            return BusquedaResponse.builder()
+                    .id(busqueda.getId())
+                    .codigoSeguimiento(busqueda.getCodigoSeguimiento())
+                    .estadoEnvio(nombre)
+                    .detalle(busqueda.getDetalle())
+                    .fechaActualizacionProducto(busqueda.getFechaActualizacionProducto())
+                    .build();
+        }
 }
+
+
+
+
