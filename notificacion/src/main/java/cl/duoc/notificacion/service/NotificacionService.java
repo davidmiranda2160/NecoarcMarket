@@ -3,7 +3,7 @@ package cl.duoc.notificacion.service;
 import java.time.LocalDateTime;
 
 import java.util.List;
-//pa ver si me ahorro el mapper, igual lo voy a poner
+
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,16 +32,16 @@ public class NotificacionService {
 
 
     public List<NotificacionResponse> listarPorUsuario(Long id) {
+        UsuarioResponse user = usuarioClient.obtenerDatosUsuario(id);
+        String nombreCompleto = (user != null) ? user.getNombre() + " " + user.getApellidos() : "Usuario Desconocido";
         return notificacionRepository.findByUsuarioIdOrderByFechaEnvioDesc(id)
                 .stream()
-                .map(notificacionMapper::toResponse)
+                .map(n -> notificacionMapper.toResponse(n, nombreCompleto)) 
                 .collect(Collectors.toList());
     }
 
     public void crear(NotificacionRequest request) {
-        //microservicio del ingeniebro david
         UsuarioResponse user = usuarioClient.obtenerDatosUsuario(request.getUsuarioId());
-        
         Notificacion n = new Notificacion();
         n.setUsuarioId(request.getUsuarioId());
         n.setTipo(request.getTipo());
@@ -53,5 +53,12 @@ public class NotificacionService {
             n.setMensaje("Aviso para Usuario ID " + request.getUsuarioId() + ": " + request.getMensaje());
         }
         notificacionRepository.save(n);
+    }
+    
+    public List<NotificacionResponse> getByUsuario(Long usuarioId) {
+    String nombre = usuarioClient.getNombreById(usuarioId); 
+    return notificacionRepository.findByUsuarioIdOrderByFechaEnvioDesc(usuarioId).stream()
+            .map(n -> notificacionMapper.toResponse(n, nombre)) 
+            .collect(Collectors.toList());
     }
 }
