@@ -8,8 +8,12 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cl.duoc.carrito.client.ProductoClient;
+import cl.duoc.carrito.client.UsuarioClient;
 import cl.duoc.carrito.dto.CarritoRequest;
 import cl.duoc.carrito.dto.CarritoResponse;
+import cl.duoc.carrito.dto.ProductoResponse;
+import cl.duoc.carrito.dto.UsuarioResponse;
 import cl.duoc.carrito.mapper.CarritoMapper;
 import cl.duoc.carrito.model.Carrito;
 import cl.duoc.carrito.repository.CarrritoRepository;
@@ -25,10 +29,17 @@ public class CarritoService {
     @Autowired
     private CarritoMapper carritoMapper;
 
-    public CarritoResponse agregarProducto(CarritoRequest request) {
+    @Autowired
+    private ProductoClient productoClient;
+
+    @Autowired
+    private UsuarioClient usuarioClient;
+
+    public CarritoResponse agregarProducto(CarritoRequest request, Long idUsuario, Long idProducto) {
         try {
+
             Optional<Carrito> carritoExistente = carritoRepository
-                    .findByProductobyUsuario(request.getIdUsuario(), request.getIdProducto());
+                    .findByProductobyUsuario(idUsuario, idProducto);
 
             Carrito productoAgregado;
 
@@ -39,11 +50,16 @@ public class CarritoService {
                 productoAgregado = carritoRepository.save(carrito);
                 log.info("Cantidad actualizada en el carrito");
             } else {
-                Carrito nuevoCarrito = carritoMapper.fromRequest(request);
+                Carrito nuevoCarrito = carritoMapper.fromRequest(request, idUsuario, idProducto);
                 productoAgregado = carritoRepository.save(nuevoCarrito);
-                log.info("Nuevo producto agregado al carrito");
+                log.info("Nuevo producto agregado al carrito del usuario");
             }
-            return carritoMapper.toResponse(productoAgregado);
+
+            UsuarioResponse user = usuarioClient.obtenerUsuario(idUsuario);
+            ProductoResponse prod = productoClient.obtenerProducto(idProducto);
+
+            return carritoMapper.toResponse(productoAgregado, user, prod);
+
         } catch (Exception e) {
             log.error("Error al agregar producto al carrito: ", e.getMessage());
             return null;
@@ -52,12 +68,14 @@ public class CarritoService {
 
     public List<CarritoResponse> obtenerCarritoPorUsuario(Long idUsuario) {
         List<Carrito> items = carritoRepository.findByIdUsuario(idUsuario);
-        if (items.isEmpty()) {
-            log.warn("El carrito del usuario está vacío");
-        }
+
+        UsuarioResponse userDto = usuarioClient.obtenerUsuario(idUsuario);
 
         return items.stream()
-                .map(carritoMapper::toResponse)
+                .map(item -> {
+                    ProductoResponse prodDto = productoClient.obtenerProducto(item.getIdProducto());
+                    return carritoMapper.toResponse(item, userDto, prodDto);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -67,10 +85,13 @@ public class CarritoService {
 
         carrito.setCantidad(nuevaCantidad);
         carrito.setMontoTotal(nuevoMonto);
-
         Carrito actualizado = carritoRepository.save(carrito);
-        log.info("Ítem del carrito ID actualizado", id);
-        return carritoMapper.toResponse(actualizado);
+
+        UsuarioResponse userDto = usuarioClient.obtenerUsuario(actualizado.getIdUsuario());
+        ProductoResponse prodDto = productoClient.obtenerProducto(actualizado.getIdProducto());
+
+        log.info("Ítem del carrito ID {} actualizado", id);
+        return carritoMapper.toResponse(actualizado, userDto, prodDto);
     }
 
     public void eliminarProductoPorId(Long id) {
