@@ -11,14 +11,12 @@ import cl.duoc.ordenes.model.Ordenes;
 @Repository
 public interface OrdenesRepository extends JpaRepository<Ordenes, Long> {
     //Metodo para listar las ordenes de un usuario especifico
-    List<Ordenes> finByIdUsuario(Long idUsuario);
+    List<Ordenes> findByIdUsuario(Long idUsuario);
 
     //Metodo para buscar ordenes por su estado
-    List<Ordenes> finByEstadoOrdenes(String estadoOrden);
+    List<Ordenes> findByEstadoOrdenes(String estadoOrden);
 
     //Metodo para obtener la orden mas reciente de un usuario
     Optional<Ordenes> findByUsuarioFechaCreacion(Long idUsuario);
-
-    
 
 }
