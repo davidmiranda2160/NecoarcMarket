@@ -15,23 +15,23 @@ public class ResenaMapper {
 
     public Resena fromRequest(ResenaRequest request) {
         return Resena.builder()
-            .productoId(request.getProductoId())
-            .usuarioId(request.getUsuarioId())
-            .calificacion(request.getCalificacion())
-            .comentario(request.getComentario())
-            .fechaCreacion(LocalDateTime.now())
-            .build();
-    }
+                .productoId(request.getProductoId())
+                .usuarioId(request.getUsuarioId())
+                .calificacion(request.getCalificacion())
+                .comentario(request.getComentario())
+                .fechaCreacion(LocalDateTime.now())
+                .build();
+        }
 
 
     public ResenaResponse toResponse(Resena resena, String nombreUsuario) {
         return ResenaResponse.builder()
-            .id(resena.getId()) 
-            .productoId(resena.getProductoId())
-            .nombreUsuario(nombreUsuario) 
-            .calificacion(resena.getCalificacion())
-            .comentario(resena.getComentario())
-            .fechaCreacion(resena.getFechaCreacion().toString())
-            .build();
-    }
+                .id(resena.getId()) 
+                .productoId(resena.getProductoId())
+                .nombreUsuario(nombreUsuario) 
+                .calificacion(resena.getCalificacion())
+                .comentario(resena.getComentario())
+                .fechaCreacion(resena.getFechaCreacion().toString())
+                .build();
+        }
 }

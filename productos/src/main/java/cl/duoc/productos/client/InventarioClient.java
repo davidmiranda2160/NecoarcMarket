@@ -13,13 +13,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class InventarioClient {
     @Autowired
-    private WebClient webClient; // Configurado con la baseUrl de Inventario
+    private WebClient webClient; 
 
     public InventarioResponse crearRegistroInventario(InventarioRequest request) {
         log.info("Llamando a Inventario para crear registro del producto: {}", request.getProductoId());
         try {
             return webClient.post()
-                    .uri("/abastecer") // El endpoint que creamos en InventarioController
+                    .uri("/abastecer") 
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(InventarioResponse.class)

@@ -19,18 +19,18 @@ public class ProductoMapper {
                 .activo(true)
                 .build();
     }
-public ProductoResponse toResponse(Producto producto){
-    return ProductoResponse.builder()
-    .id(producto.getId())
-    .nombrep(producto.getNombrep())
-    .descripcion(producto.getDescripcion())
-    .precio(producto.getPrecio())
-    .stock(producto.getStock())
-    .categoria(producto.getCategoria())
-    .vendedorId(producto.getVendedorId())
-    .build();
-    
-}
+    public ProductoResponse toResponse(Producto producto){
+        return ProductoResponse.builder()
+                .id(producto.getId())
+                .nombrep(producto.getNombrep())
+                .descripcion(producto.getDescripcion())
+                .precio(producto.getPrecio())
+                .stock(producto.getStock())
+                .categoria(producto.getCategoria())
+                .vendedorId(producto.getVendedorId())
+                .build();
+        
+    }
 
 
 
