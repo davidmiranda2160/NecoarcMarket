@@ -1,5 +1,6 @@
 package cl.duoc.usuario.service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,15 @@ public class UsuarioService {
     @Autowired
     private UsuarioMapper usuarioMapper;
 
+    
+    
+    public List<Usuario> listarUsuarios(){
+        log.info("Buscando todos los usuarios");
+        return usuarioRespository.findAll();
+    }
+    
+    
+    
     public UsuarioResponse crearUsuario(UsuarioRequest request){
         try{
         Usuario usuario = usuarioMapper.fromRequest(request);
