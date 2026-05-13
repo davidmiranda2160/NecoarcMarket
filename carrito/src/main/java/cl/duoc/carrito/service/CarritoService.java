@@ -39,7 +39,7 @@ public class CarritoService {
         try {
 
             Optional<Carrito> carritoExistente = carritoRepository
-                    .findByProductobyUsuario(idUsuario, idProducto);
+                    .findByIdUsuarioAndIdProducto(idUsuario, idProducto);
 
             Carrito productoAgregado;
 

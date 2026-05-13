@@ -9,9 +9,9 @@ import cl.duoc.carrito.dto.ProductoResponse;
 @Component
 public class ProductoClient {
     private final WebClient webClient;
-
+    
     public ProductoClient(WebClient.Builder webClientBuilder, 
-        @Value("&{service.producto.baseUrl}") String baseUrl){
+        @Value("${service.producto.baseUrl}") String baseUrl){
             this.webClient = webClientBuilder.baseUrl(baseUrl)
             .build();
         }

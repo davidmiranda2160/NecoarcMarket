@@ -6,8 +6,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import cl.duoc.carrito.dto.UsuarioResponse;
 
-
-
 @Component
 public class UsuarioClient {
 
