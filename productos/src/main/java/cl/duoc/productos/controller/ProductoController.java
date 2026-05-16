@@ -70,8 +70,7 @@ public class ProductoController {
         productoService.eliminarProducto(id);
         return ResponseEntity.noContent().build();
     }
-
-   
+//Colorar un eliminar cantidades pequeñas de productos
 
 
 }
