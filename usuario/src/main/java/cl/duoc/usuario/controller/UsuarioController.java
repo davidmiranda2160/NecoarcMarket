@@ -27,23 +27,20 @@ import lombok.extern.slf4j.Slf4j;
 public class UsuarioController {
 
     @Autowired
-    UsuarioService usuarioService;
+    private UsuarioService usuarioService;
 
     @GetMapping("/{id}")
-    public UsuarioResponse buscarUsuarioPorId(@PathVariable Long id) {
-        log.info("POST /v1/usuario");
-        return usuarioService.obtenerUsuarioPorId(id);
+    public ResponseEntity<UsuarioResponse> buscarUsuarioPorId(@PathVariable Long id) {
+        log.info("GET /v1/usuario/{}", id);
+        UsuarioResponse response = usuarioService.obtenerUsuarioPorId(id);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
     public ResponseEntity<UsuarioResponse> crearUsuario(@Valid @RequestBody UsuarioRequest request) {
         log.info("POST /v1/usuario - Intentando crear usuario");
+    
         UsuarioResponse response = usuarioService.crearUsuario(request);
-
-        if (response == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -51,7 +48,8 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponse> actualizarUsuario(@PathVariable Long id,
         @Valid @RequestBody UsuarioRequest request) {
         log.info("PUT /v1/usuario/{}", id);
-        return ResponseEntity.ok().body(usuarioService.actualizarUsuario(id, request));
+        UsuarioResponse response = usuarioService.actualizarUsuario(id, request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
@@ -61,10 +59,10 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    //Falta listar usuarios
-    @GetMapping()
-    public List<Usuario> listarUsuarios() {
-        log.info("GET /v1/usuarios/listarUsuarios");
-        return usuarioService.listarUsuarios();
+    @GetMapping
+    public ResponseEntity<List<Usuario>> listarUsuarios() {
+        log.info("GET /v1/usuario - Listando todos los usuarios"); 
+        List<Usuario> usuarios = usuarioService.listarUsuarios();
+        return ResponseEntity.ok(usuarios);
     }
 }

@@ -1,5 +1,7 @@
 package cl.duoc.ordenes.mapper;
 
+import java.math.BigDecimal;
+
 import org.springframework.stereotype.Component;
 
 import cl.duoc.ordenes.dto.EnvioResponse;
@@ -12,7 +14,7 @@ import cl.duoc.ordenes.model.Ordenes;
 @Component
 public class OrdenesMapper {
 
-     public Ordenes fromRequest(OrdenesRequest request, int montoTotal) {
+     public Ordenes fromRequest(OrdenesRequest request, BigDecimal montoTotal) {
         return Ordenes.builder()
                 .idUsuario(request.getIdUsuario())
                 .direccionEnvio(request.getDireccionEnvio())

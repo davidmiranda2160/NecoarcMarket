@@ -1,5 +1,6 @@
 package cl.duoc.ordenes.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,7 +56,7 @@ public class OrdenesService {
             return null;
         }
 
-        int montoTotal = carrito.getMontoTotal();
+        BigDecimal montoTotal = carrito.getMontoTotal();
 
         UsuarioResponse usuario = usuarioClient.obtenerUsuarioPorId(request.getIdUsuario());
 
@@ -65,7 +66,7 @@ public class OrdenesService {
 
         PagosRequest pagosRequest = new PagosRequest();
         pagosRequest.setMetodoPago(request.getMetodoPago());
-        pagosRequest.setMontoAPagar(montoTotal);
+        pagosRequest.setMontoAPagar(montoTotal != null ? montoTotal.doubleValue() : 0.0);
         PagosResponse pagosResponse = pagosClient.procesarPago(pagosRequest);
 
         EnvioRequest envioRequest = new EnvioRequest();

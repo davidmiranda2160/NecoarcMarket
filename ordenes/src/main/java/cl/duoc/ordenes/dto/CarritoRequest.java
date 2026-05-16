@@ -1,5 +1,7 @@
 package cl.duoc.ordenes.dto;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,5 +15,5 @@ public class CarritoRequest {
     private int cantidad;
 
     @Min(value = 0, message = "El monto total no puede ser negativo")
-    private int montoTotal;
+    private BigDecimal montoTotal;
 }

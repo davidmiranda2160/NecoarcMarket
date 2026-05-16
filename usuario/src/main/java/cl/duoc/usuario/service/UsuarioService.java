@@ -31,26 +31,29 @@ public class UsuarioService {
     }
     
     public UsuarioResponse crearUsuario(UsuarioRequest request){
-        try{
+        log.info("Intentando crear al usuario con correo: {}", request.getCorreo());
+        
         Usuario usuario = usuarioMapper.fromRequest(request);
         Usuario usuarioGuardado = usuarioRespository.save(usuario);
-        log.info("Usuario creado");
+        
+        log.info("Usuario creado exitosamente");
         return usuarioMapper.toResponse(usuarioGuardado);
-        }catch(Exception e){
-        log.error("Error no se pudo crear al usaurio");
-        }
-        return null;
     }
 
     public UsuarioResponse obtenerUsuarioPorId(Long id) {
+        log.info("Buscando usuario con ID: {}", id);
+        
         Usuario usuario = usuarioRespository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No se encontró el usuario con id: "+ id)); //Cambié el RunTimeException cuando añadí el restocontrolleradvice
+                .orElseThrow(() -> new NoSuchElementException("No se encontró el usuario con id: " + id));
+        
         return usuarioMapper.toResponse(usuario);
     }
 
     public UsuarioResponse actualizarUsuario(Long id, UsuarioRequest datosNuevos) {
+        log.info("Buscando usuario con ID: {} para actualizar", id);
+        
         Usuario usuarioExistente = usuarioRespository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No existe el usuario"+ id + "a actualizar")); //añadido el id para la excepcion
+                .orElseThrow(() -> new NoSuchElementException("No existe el usuario " + id + " a actualizar"));
 
         if (datosNuevos.getNombre() != null) {
             usuarioExistente.setNombre(datosNuevos.getNombre());
@@ -78,9 +81,12 @@ public class UsuarioService {
     }
 
     public void eliminarUsuarioPorId(Long id) {
+        log.info("Intentando eliminar usuario con ID: {}", id);
+        
         if (!usuarioRespository.existsById(id)) {
-            log.error("No se pudo encontrar al usuario con id: ", id);
+            throw new NoSuchElementException("No se pudo encontrar al usuario con id: " + id + " para eliminar");
         }
+        
         usuarioRespository.deleteById(id);
         log.info("Usuario eliminado correctamente");
     }

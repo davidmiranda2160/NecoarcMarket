@@ -18,10 +18,12 @@ import cl.duoc.carrito.dto.UsuarioResponse;
 import cl.duoc.carrito.mapper.CarritoMapper;
 import cl.duoc.carrito.model.Carrito;
 import cl.duoc.carrito.repository.CarrritoRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@Transactional 
 public class CarritoService {
 
     @Autowired
@@ -37,40 +39,45 @@ public class CarritoService {
     private UsuarioClient usuarioClient;
 
     public CarritoResponse agregarProducto(CarritoRequest request, Long idUsuario, Long idProducto) {
-        try {
+        log.info("Procesando adición de producto ID {} para el usuario ID {}", idProducto, idUsuario);
 
-            Optional<Carrito> carritoExistente = carritoRepository
-                    .findByIdUsuarioAndIdProducto(idUsuario, idProducto);
-
-            Carrito productoAgregado;
-
-            if (carritoExistente.isPresent()) {
-                Carrito carrito = carritoExistente.get();
-                carrito.setCantidad(carrito.getCantidad() + request.getCantidad());
-                carrito.setMontoTotal(carrito.getMontoTotal().add(request.getMontoTotal()));
-                productoAgregado = carritoRepository.save(carrito);
-                log.info("Cantidad actualizada en el carrito");
-            } else {
-                Carrito nuevoCarrito = carritoMapper.fromRequest(request, idUsuario, idProducto);
-                productoAgregado = carritoRepository.save(nuevoCarrito);
-                log.info("Nuevo producto agregado al carrito del usuario");
-            }
-
-            UsuarioResponse user = usuarioClient.obtenerUsuario(idUsuario);
-            ProductoResponse prod = productoClient.obtenerProducto(idProducto);
-
-            return carritoMapper.toResponse(productoAgregado, user, prod);
-
-        } catch (Exception e) {
-            log.error("Error al agregar producto al carrito: ", e.getMessage());
-            return null;
+        if (request.getCantidad() <= 0) {
+            throw new IllegalArgumentException("La cantidad a agregar debe ser mayor a cero.");
         }
+
+        UsuarioResponse user = usuarioClient.obtenerUsuario(idUsuario);
+        ProductoResponse prod = productoClient.obtenerProducto(idProducto);
+
+        Optional<Carrito> carritoExistente = carritoRepository
+                .findByIdUsuarioAndIdProducto(idUsuario, idProducto);
+
+        Carrito productoAgregado;
+
+        if (carritoExistente.isPresent()) {
+            Carrito carrito = carritoExistente.get();
+            carrito.setCantidad(carrito.getCantidad() + request.getCantidad());
+            carrito.setMontoTotal(carrito.getMontoTotal().add(request.getMontoTotal()));
+            productoAgregado = carritoRepository.save(carrito);
+            log.info("Cantidad modificada en el registro de carrito existente");
+        } else {
+            Carrito nuevoCarrito = carritoMapper.fromRequest(request, idUsuario, idProducto);
+            productoAgregado = carritoRepository.save(nuevoCarrito);
+            log.info("Nuevo registro creado en el carrito");
+        }
+
+        return carritoMapper.toResponse(productoAgregado, user, prod);
     }
 
     public List<CarritoResponse> obtenerCarritoPorUsuario(Long idUsuario) {
-        List<Carrito> items = carritoRepository.findByIdUsuario(idUsuario);
+        log.info("Buscando carrito del usuario ID: {}", idUsuario);
 
         UsuarioResponse userDto = usuarioClient.obtenerUsuario(idUsuario);
+
+        List<Carrito> items = carritoRepository.findByIdUsuario(idUsuario);
+
+        if (items.isEmpty()) {
+            throw new NoSuchElementException("El carrito del usuario ID " + idUsuario + " no contiene productos.");
+        }
 
         return items.stream()
                 .map(item -> {
@@ -81,8 +88,14 @@ public class CarritoService {
     }
 
     public CarritoResponse actualizarCantidad(Long id, int nuevaCantidad, BigDecimal nuevoMonto) {
+        log.info("Actualizando unidades del ítem de carrito ID: {}", id);
+
+        if (nuevaCantidad <= 0) {
+            throw new IllegalArgumentException("La nueva cantidad debe ser superior a cero.");
+        }
+
         Carrito carrito = carritoRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No existe el ítem en el carrito"));
+                .orElseThrow(() -> new NoSuchElementException("No se encontró el ítem solicitado en el carrito."));
 
         carrito.setCantidad(nuevaCantidad);
         carrito.setMontoTotal(nuevoMonto);
@@ -91,21 +104,27 @@ public class CarritoService {
         UsuarioResponse userDto = usuarioClient.obtenerUsuario(actualizado.getIdUsuario());
         ProductoResponse prodDto = productoClient.obtenerProducto(actualizado.getIdProducto());
 
-        log.info("Ítem del carrito ID {} actualizado", id);
         return carritoMapper.toResponse(actualizado, userDto, prodDto);
     }
 
     public void eliminarProductoPorId(Long id) {
+        log.info("Eliminando ítem de carrito ID: {}", id);
+
         if (!carritoRepository.existsById(id)) {
-            log.error("No se encontró el producto con id: ", id);
-            throw new NoSuchElementException("producto no encontrado");
+            log.error("Error al intentar eliminar: No existe el registro con ID: {}", id);
+            throw new NoSuchElementException("No se pudo eliminar el producto porque no existe en el carrito.");
         }
+
         carritoRepository.deleteById(id);
-        log.info("Producto eliminado del carrito");
+        log.info("Ítem eliminado con éxito");
     }
 
     public void vaciarCarrito(Long idUsuario) {
+        log.info("Vaciando por completo el carrito del usuario ID: {}", idUsuario);
+
+        usuarioClient.obtenerUsuario(idUsuario);
+
         carritoRepository.deleteByIdUsuario(idUsuario);
-        log.info("Carrito del usuario vaciado correctamente", idUsuario);
+        log.info("Todos los productos del usuario han sido removidos");
     }
 }
