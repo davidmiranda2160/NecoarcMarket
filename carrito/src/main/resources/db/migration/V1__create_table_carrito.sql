@@ -1,7 +1,7 @@
-CREATE TABLE carrito(
-    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    id_Usuario BIGINT NOT NULL,
-    id_Producto BIGINT NOT NULL,
-    cantidad INT NOT NULL DEFAULT 0,
-    monto_Total INT NOT NULL DEFAULT 0
+CREATE TABLE carrito (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario BIGINT NOT NULL,
+    id_producto BIGINT NOT NULL,
+    cantidad INT NOT NULL,
+    monto_total DECIMAL(19, 2) NOT NULL
 );

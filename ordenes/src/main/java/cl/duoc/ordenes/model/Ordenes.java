@@ -1,5 +1,6 @@
 package cl.duoc.ordenes.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -28,13 +29,16 @@ public class Ordenes {
     private Long idUsuario;
 
     @Column(nullable= false)
+    private Long idEnvio;
+
+    @Column(nullable= false)
     private Date fechaCreacion;
 
     @Column(nullable= false)
     private String estadoOrden;
 
     @Column(nullable= false)
-    private double montoTotal;
+    private BigDecimal montoTotal;
 
     @Column(nullable= false)
     private String direccionEnvio;

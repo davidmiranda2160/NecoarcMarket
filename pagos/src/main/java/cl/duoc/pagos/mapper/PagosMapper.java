@@ -18,7 +18,7 @@ public class PagosMapper {
 
     public PagosResponse toResponse(Pagos pagos) {
         return PagosResponse.builder()
-                .idPedido(pagos.getIdPedido())
+                .idOrden(pagos.getIdOrden())
                 .metodoPago(pagos.getMetodoPago())
                 .montoAPagar(pagos.getMontoAPagar())
                 .montoPagado(pagos.getMontoPagado())

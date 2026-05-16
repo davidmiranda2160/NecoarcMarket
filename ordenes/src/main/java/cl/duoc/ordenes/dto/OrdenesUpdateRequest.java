@@ -8,11 +8,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EnvioRequest {
-    @NotBlank(message= "La empresa de transporte es obligatoria")
+public class OrdenesUpdateRequest {
+    @NotBlank(message = "La dirección de destino no puede estar vacía")
+    private String direccionEnvio;
+    
+    @NotBlank(message= "Tiene que elegir una empresa para su envio")
     private String empresaTransporte;
-
-    @NotBlank(message= "Tiene que haber una direccion para entregar el envio")
-    private String direccionDestino;
-
 }

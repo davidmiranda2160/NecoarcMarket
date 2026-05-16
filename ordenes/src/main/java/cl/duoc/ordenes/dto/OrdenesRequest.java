@@ -18,4 +18,9 @@ public class OrdenesRequest {
     @NotBlank(message="La direccion de envio es obligatoria")
     private String direccionEnvio;
 
+    @NotBlank(message= "El metodo de pago es obligatorio")
+    private String metodoPago;
+
+    @NotBlank(message= "Tiene que elegir una empresa de transporte para su envio")
+    private String empresaTransporte;
 }

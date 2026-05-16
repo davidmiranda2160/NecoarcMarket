@@ -1,5 +1,6 @@
 package cl.duoc.ordenes.dto;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -16,7 +17,9 @@ public class OrdenesResponse {
     private Long idUsuario;
     private Date fechaCreacion;
     private String estadoOrden;
-    private double montoTotal;
+    private BigDecimal montoTotal;
     private String direccionEnvio;
-    private Long idPago;
+    private UsuarioResponse usuario;
+    private EnvioResponse envio;
+    private PagosResponse pagos;
 }

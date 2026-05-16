@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PagosResponse {
     private Long id;
-    private Long idPedido; 
+    private Long idOrden; 
     private String metodoPago;
     private double montoAPagar;
     private double montoPagado;
