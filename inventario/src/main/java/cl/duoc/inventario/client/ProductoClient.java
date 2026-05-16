@@ -25,12 +25,12 @@ public class ProductoClient {
         log.info("Llamando al microservicio de Productos para el ID: {}", id);
         try {
             return webClient.get()
-                    //Revisar bien la asignacion del endpoint o me va a cargar la verga
                     .uri("/{id}", id) 
                     .retrieve()
                     .bodyToMono(ProductoResponse.class)
                     .block();
         } catch (WebClientResponseException ex) {
+            //Es una copiea de los case de hospital, no tengo que usarlos por ahora, ya que no tenemos validación de token para accesos
             log.error("Error al comunicar con Productos para el ID: {}. Estado: {}", id, ex.getStatusCode());
             switch (ex.getStatusCode().value()) {
                 case 404 -> throw new NoSuchElementException("El producto con ID " + id + " no existe en el catálogo.");

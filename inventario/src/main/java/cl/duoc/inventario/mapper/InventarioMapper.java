@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 
 import cl.duoc.inventario.dto.InventarioRequest;
 import cl.duoc.inventario.dto.InventarioResponse;
+import cl.duoc.inventario.dto.ProductoDetalleDTO;
+import cl.duoc.inventario.dto.ProductoResponse;
 import cl.duoc.inventario.model.Inventario;
 
 @Component
@@ -24,6 +26,16 @@ public class InventarioMapper {
                 .cantidad(inventario.getCantidad())
                 .ultimaActualizacion(inventario.getUltimaActualizacion())
                 .build();
+
+    }
+    //Prueba de mover el mapper de service para acá
+    public ProductoDetalleDTO toDetalleDTO(Inventario inventario, ProductoResponse producto){
+        return ProductoDetalleDTO.builder()
+                .productoId(inventario.getProductoId())
+                .nombre(producto.getNombrep())
+                .cantidad(inventario.getCantidad())
+                .build();
+
 
     }
 }

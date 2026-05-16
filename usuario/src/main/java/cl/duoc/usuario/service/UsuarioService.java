@@ -46,13 +46,13 @@ public class UsuarioService {
 
     public UsuarioResponse obtenerUsuarioPorId(Long id) {
         Usuario usuario = usuarioRespository.findById(id)
-                .orElseThrow(() -> new RuntimeException("No encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("No se encontró el usuario con id: "+ id)); //Cambié el RunTimeException cuando añadí el restocontrolleradvice
         return usuarioMapper.toResponse(usuario);
     }
 
     public UsuarioResponse actualizarUsuario(Long id, UsuarioRequest datosNuevos) {
         Usuario usuarioExistente = usuarioRespository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No existe el usuario a actualizar"));
+                .orElseThrow(() -> new NoSuchElementException("No existe el usuario"+ id + "a actualizar")); //añadido el id para la excepcion
 
         if (datosNuevos.getNombre() != null) {
             usuarioExistente.setNombre(datosNuevos.getNombre());

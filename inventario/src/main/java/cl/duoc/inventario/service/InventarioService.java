@@ -46,7 +46,6 @@ public class InventarioService {
                 .orElseGet(() -> Inventario.builder().productoId(productoId).cantidad(0).build());
         inventario.setCantidad(inventario.getCantidad() + cantidad);
         inventario.setUltimaActualizacion(LocalDateTime.now());
-        
         return inventarioMapper.toResponse(inventarioRepository.save(inventario));
     }
 
@@ -68,19 +67,11 @@ public class InventarioService {
                 .map(inv -> inv.getCantidad() >= cantidadRequerida)
                 .orElse(false);
     }
-    //obtener el id para mostrar el nombre en postman (quitar spring security)
-    //Limpie productodto para usar el productoresponse
+
     public ProductoDetalleDTO obtenerDetalleCompleto(Long id) {
-
         Inventario inv = inventarioRepository.findByProductoId(id)
-                .orElseThrow(() -> new NoSuchElementException("El producto no tiene registro en el inventario"));
+                .orElseThrow(() -> new NoSuchElementException("El producto con id " + id + " no tiene registro en el inventario"));
         ProductoResponse prod = productoClient.obtenerProductoPorId(id);
-        ProductoDetalleDTO dto = new ProductoDetalleDTO();
-        dto.setProductoId(id);
-        dto.setNombre(prod.getNombrep()); 
-        dto.setCantidad(inv.getCantidad());
-        
-        return dto;
+        return inventarioMapper.toDetalleDTO(inv, prod);
     }
-
 }

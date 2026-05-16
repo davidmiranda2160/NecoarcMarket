@@ -29,12 +29,7 @@ public class InventarioController {
         return ResponseEntity.ok(inventarioService.agregarStock(request.getProductoId(), request.getCantidad()));
 
     }
-
-   /* @GetMapping("/producto/{productoId}")
-    public ResponseEntity<InventarioResponse> obtenerStock(@PathVariable Long productoId) {
-        log.info("API GET: Consultando stock del producto {}", productoId);
-        return ResponseEntity.ok(inventarioService.obtenerStockPorProducto(productoId));
-    }*/
+    
     @GetMapping("/producto/{id}")
     public ResponseEntity<ProductoDetalleDTO> obtenerDetalleCompleto(@PathVariable Long id){
         ProductoDetalleDTO detalle = inventarioService.obtenerDetalleCompleto(id);
