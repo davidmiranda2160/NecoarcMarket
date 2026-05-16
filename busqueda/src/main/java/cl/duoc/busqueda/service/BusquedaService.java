@@ -8,50 +8,40 @@ import org.springframework.web.server.ResponseStatusException;
 import cl.duoc.busqueda.client.EnvioClient;
 import cl.duoc.busqueda.dto.BusquedaResponse;
 import cl.duoc.busqueda.dto.EnvioResponse;
+import cl.duoc.busqueda.mapper.BusquedaMapper;
 import cl.duoc.busqueda.model.Busqueda;
 import cl.duoc.busqueda.repository.BusquedaRepository;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class BusquedaService {
-    @Autowired
-    private EnvioClient enviosClient;
-
     @Autowired
     private BusquedaRepository busquedaRepository;
 
-   /* public BusquedaResponse obtenerSeguimientoCompleto(String codigo) {
-        // Llamada al micro de david plox apurate
-        EnvioResponse envio = enviosClient.consultarEstado(codigo); //Revisar esta parte
-        
-        //logica de respuesta, pero debo esperar a david
-        BusquedaResponse res = new BusquedaResponse();
-        res.setCodigoSeguimiento(codigo);
-        res.setEstadoEnvio(envio.getEstadoEnvio());
-        
-        return res;
-    }*/
-    //Nota importante, esperar a que david finalice Envio para poder arreglar EnvioCliente de Busqueda, así reparo BusquedaService
+    @Autowired
+    private EnvioClient envioClient;
+
+    @Autowired
+    private BusquedaMapper busquedaMapper;
 
     public BusquedaResponse obtenerSeguimientoCompleto(String codigo) {
         Busqueda busquedaLocal = busquedaRepository.findByCodigoSeguimiento(codigo)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
-                        "El código de seguimiento '" + codigo + "' no está registrado en NecoarcMarket."));
+                    "El código de seguimiento '" + codigo + "' no está registrado."));
+        String estadoFinal = busquedaLocal.getEstadoEnvio(); 
 
-        Long envioId = busquedaLocal.getEnvioId();
-        EnvioResponse envioExterno = enviosClient.consultarEstado(envioId); 
-        BusquedaResponse res = new BusquedaResponse();
-        res.setCodigoSeguimiento(codigo);
-        if (envioExterno != null) {
-            res.setEstadoEnvio(envioExterno.getEstadoEnvio());
-                        if (!busquedaLocal.getEstadoEnvio().equals(envioExterno.getEstadoEnvio())) {
-                busquedaLocal.setEstadoEnvio(envioExterno.getEstadoEnvio());
+        try {
+            EnvioResponse envioExterno = envioClient.consultarEstado(busquedaLocal.getEnvioId());   //Debo añadir también coherencia con el código de seguimiento de david vs el mío
+            if (envioExterno != null && envioExterno.getEstadoEnvio() != null) {
+                estadoFinal = envioExterno.getEstadoEnvio(); 
+                busquedaLocal.setEstadoEnvio(estadoFinal);
                 busquedaRepository.save(busquedaLocal);
             }
-        } else {
-            res.setEstadoEnvio(busquedaLocal.getEstadoEnvio());
+        } catch (Exception e) {
+            log.warn("No se pudo conectar con Envíos. Usando estado local de respaldo: {}", e.getMessage());
         }
-        
-        return res;
+        return busquedaMapper.toResponse(busquedaLocal, estadoFinal);
     }
 }
 

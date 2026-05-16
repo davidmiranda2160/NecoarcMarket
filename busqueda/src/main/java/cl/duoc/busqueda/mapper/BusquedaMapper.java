@@ -6,7 +6,7 @@ import cl.duoc.busqueda.dto.BusquedaRequest;
 import cl.duoc.busqueda.dto.BusquedaResponse;
 import cl.duoc.busqueda.model.Busqueda;
 
-//Mapper automatico, veamos si no explota en mil pedazos
+
 
 @Component
 public class BusquedaMapper {
@@ -19,15 +19,16 @@ public class BusquedaMapper {
                 .fechaActualizacionProducto(java.time.LocalDateTime.now())
                 .build();
     }
-    public BusquedaResponse toResponse(Busqueda busqueda, String nombre){
-            return BusquedaResponse.builder()
-                    .id(busqueda.getId())
-                    .codigoSeguimiento(busqueda.getCodigoSeguimiento())
-                    .envioId(busqueda.getEnvioId())    
-                    .estadoEnvio(nombre)
-                    .detalle(busqueda.getDetalle())
-                    .fechaActualizacionProducto(busqueda.getFechaActualizacionProducto())
-                    .build();
+    public BusquedaResponse toResponse(Busqueda busqueda, String estadoNombre){
+        return BusquedaResponse.builder()
+                .id(busqueda.getId())
+                .codigoSeguimiento(busqueda.getCodigoSeguimiento())
+                .envioId(busqueda.getEnvioId())    
+                .estadoEnvio(estadoNombre)
+                .detalle(busqueda.getDetalle())
+                .nombreProducto(busqueda.getNombreProducto()) 
+                .fechaActualizacionProducto(busqueda.getFechaActualizacionProducto())
+                .build();
         }
 }
 
