@@ -20,48 +20,51 @@ import cl.duoc.usuario.model.Usuario;
 import cl.duoc.usuario.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController
-@RequestMapping("/v1/usuarios")
+@RequestMapping("/v1/usuario")
 @Slf4j
 public class UsuarioController {
-    @Autowired UsuarioService usuarioService;
 
+    @Autowired
+    UsuarioService usuarioService;
 
     @GetMapping("/{id}")
     public UsuarioResponse buscarUsuarioPorId(@PathVariable Long id) {
-        log.info("");
+        log.info("POST /v1/usuario");
         return usuarioService.obtenerUsuarioPorId(id);
     }
 
     @PostMapping
     public ResponseEntity<UsuarioResponse> crearUsuario(@Valid @RequestBody UsuarioRequest request) {
-        log.info("");
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.crearUsuario(request));
+        log.info("POST /v1/usuario - Intentando crear usuario");
+        UsuarioResponse response = usuarioService.crearUsuario(request);
+
+        if (response == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponse> actualizarPaciente(@PathVariable Long id,
+    public ResponseEntity<UsuarioResponse> actualizarUsuario(@PathVariable Long id,
         @Valid @RequestBody UsuarioRequest request) {
-        log.info("", id);
+        log.info("PUT /v1/usuario/{}", id);
         return ResponseEntity.ok().body(usuarioService.actualizarUsuario(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarPaciente(@PathVariable Long id) {
-        log.info("", id);
+    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
+        log.info("DELETE /v1/usuario/{}", id);
         usuarioService.eliminarUsuarioPorId(id);
         return ResponseEntity.noContent().build();
     }
 
     //Falta listar usuarios
     @GetMapping()
-    public List<Usuario> listarUsuarios(){
-        log.info("GET /api/usuarios/listarUsuarios");
+    public List<Usuario> listarUsuarios() {
+        log.info("GET /v1/usuarios/listarUsuarios");
         return usuarioService.listarUsuarios();
     }
-    
-
 }

@@ -20,7 +20,7 @@ public class UsuarioClient {
 
     public UsuarioResponse obtenerUsuario(Long id){
         return this.webClient.get()
-                .uri("/{id}", id)
+                .uri("/v1/usuario/{id}", id)
                 .retrieve()
                 .bodyToMono(UsuarioResponse.class)
                 .block();

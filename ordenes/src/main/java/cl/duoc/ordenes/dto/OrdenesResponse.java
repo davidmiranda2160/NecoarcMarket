@@ -18,5 +18,7 @@ public class OrdenesResponse {
     private String estadoOrden;
     private double montoTotal;
     private String direccionEnvio;
-    private Long idPago;
+    private UsuarioResponse usuario;
+    private EnvioResponse envio;
+    private PagosResponse pagos;
 }

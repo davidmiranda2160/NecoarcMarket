@@ -22,7 +22,7 @@ public class PagosService {
     @Autowired
     private PagosMapper pagosMapper;
 
-    public PagosResponse crearPago(PagosRequest request) {
+    public PagosResponse procesarPago(PagosRequest request) {
         try {
             Pagos pago = pagosMapper.fromRequest(request);
             Pagos pagoGuardado = pagosRepository.save(pago);
@@ -36,9 +36,9 @@ public class PagosService {
         }
     }
 
-    public PagosResponse obtenerPagoPorPedido(Long idPedido) {
-        Pagos pago = pagosRepository.findByIdPedido(idPedido)
-                .orElseThrow(() -> new NoSuchElementException("No se encontro un pago para el id: " + idPedido));
+    public PagosResponse obtenerPagoPorOrden(Long idOrden) {
+        Pagos pago = pagosRepository.findByIdOrden(idOrden)
+                .orElseThrow(() -> new NoSuchElementException("No se encontro un pago para el id: " + idOrden));
 
         return pagosMapper.toResponse(pago);
     }

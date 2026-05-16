@@ -24,7 +24,7 @@ public class Pagos {
     private Long id;
 
     @Column(nullable= false)
-    private Long idPedido; 
+    private Long idOrden; 
 
     @Column(nullable= false)
     private String metodoPago;

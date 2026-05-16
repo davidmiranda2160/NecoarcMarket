@@ -18,7 +18,7 @@ public class ProductoClient {
 
         public ProductoResponse obtenerProducto(Long id){
             return this.webClient.get()
-                    .uri("/{id}")
+                    .uri("/v1/productos/{id}", id)
                     .retrieve()
                     .bodyToMono(ProductoResponse.class)
                     .block();

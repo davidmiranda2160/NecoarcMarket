@@ -27,18 +27,18 @@ public class PagosController {
     private PagosService pagosService;
 
     @GetMapping("/{id}")
-    public PagosResponse obtenerCarritoPorUsuario(@PathVariable Long idPedido) {
-        return pagosService.obtenerPagoPorPedido(idPedido);
+    public PagosResponse obtenerCarritoPorUsuario(@PathVariable Long idOrden) {
+        return pagosService.obtenerPagoPorOrden(idOrden);
     }
 
     @PostMapping
-    public ResponseEntity<PagosResponse> agregarProducto(@Valid @RequestBody PagosRequest request) {
+    public ResponseEntity<PagosResponse> procesarPago(@Valid @RequestBody PagosRequest request) {
         log.info("");
-        return ResponseEntity.status(HttpStatus.CREATED).body(pagosService.crearPago(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(pagosService.procesarPago(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PagosResponse> actualizarPaciente(@PathVariable Long id,
+    public ResponseEntity<PagosResponse> actualizarPago(@PathVariable Long id,
             @Valid @RequestBody PagosRequest request) {
         log.info("", id);
         return ResponseEntity

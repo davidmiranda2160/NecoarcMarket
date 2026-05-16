@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/carrito")
+@RequestMapping("v1/carrito")
 @Slf4j
 public class CarritoController {
     @Autowired CarritoService carritoService;
@@ -40,10 +40,10 @@ public class CarritoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CarritoResponse> actualizarCliente(@PathVariable Long id,
+    public ResponseEntity<CarritoResponse> actualizarCarrito(@PathVariable Long id,
         @Valid 
         @RequestBody CarritoRequest request) {
-        log.info("Sea actualizado el item del carrito: ", id);
+        log.info("Sea actualizado el item del carrito: {}", id);
         return ResponseEntity
         .ok()
         .body(carritoService.actualizarCantidad(id, request.getCantidad(), request.getMontoTotal()));

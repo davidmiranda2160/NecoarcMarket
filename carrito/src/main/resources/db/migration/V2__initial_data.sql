@@ -1,11 +1,6 @@
-INSERT INTO carrito (id_Usuario, id_Producto, cantidad, monto_Total) 
-VALUES (1, 1, 1, 25.99); -- Un peluche de Neco-Arc
-
-INSERT INTO carrito (id_Usuario, id_Producto, cantidad, monto_Total) 
-VALUES (4, 4, 2, 24.00); -- Dos posters de Ragnarok
-
-INSERT INTO carrito (id_Usuario, id_Producto, cantidad, monto_Total) 
-VALUES (5, 2, 1, 45.50); -- Una sudadera de Melty Blood
-
-INSERT INTO carrito (id_Usuario, id_Producto, cantidad, monto_Total) 
-VALUES (5, 5, 3, 25.50); -- Tres sets de stickers 
+INSERT INTO carrito (id_usuario, id_producto, cantidad, monto_total) 
+VALUES 
+(1, 1, 1, 25.99), -- Carlos: Peluche Neco-Arc
+(2, 4, 2, 24.00), -- Valentina: Dos posters de Ragnarok
+(3, 2, 1, 45.50), -- Matías: Sudadera de Melty Blood
+(1, 5, 3, 25.50); -- Carlos: Tres sets de stickers

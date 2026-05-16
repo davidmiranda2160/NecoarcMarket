@@ -11,10 +11,12 @@ import cl.duoc.usuario.dto.UsuarioResponse;
 import cl.duoc.usuario.mapper.UsuarioMapper;
 import cl.duoc.usuario.model.Usuario;
 import cl.duoc.usuario.repository.UsuarioRespository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@Transactional
 public class UsuarioService {
 
     @Autowired
@@ -23,14 +25,10 @@ public class UsuarioService {
     @Autowired
     private UsuarioMapper usuarioMapper;
 
-    
-    
     public List<Usuario> listarUsuarios(){
         log.info("Buscando todos los usuarios");
         return usuarioRespository.findAll();
     }
-    
-    
     
     public UsuarioResponse crearUsuario(UsuarioRequest request){
         try{

@@ -1,5 +1,6 @@
 package cl.duoc.carrito.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -46,7 +47,7 @@ public class CarritoService {
             if (carritoExistente.isPresent()) {
                 Carrito carrito = carritoExistente.get();
                 carrito.setCantidad(carrito.getCantidad() + request.getCantidad());
-                carrito.setMontoTotal(carrito.getMontoTotal() + request.getMontoTotal());
+                carrito.setMontoTotal(carrito.getMontoTotal().add(request.getMontoTotal()));
                 productoAgregado = carritoRepository.save(carrito);
                 log.info("Cantidad actualizada en el carrito");
             } else {
@@ -79,7 +80,7 @@ public class CarritoService {
                 .collect(Collectors.toList());
     }
 
-    public CarritoResponse actualizarCantidad(Long id, int nuevaCantidad, int nuevoMonto) {
+    public CarritoResponse actualizarCantidad(Long id, int nuevaCantidad, BigDecimal nuevoMonto) {
         Carrito carrito = carritoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("No existe el ítem en el carrito"));
 

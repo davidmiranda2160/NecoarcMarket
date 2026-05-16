@@ -1,5 +1,7 @@
 package cl.duoc.carrito.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,6 +34,5 @@ public class Carrito {
     private int cantidad;
 
     @Column(nullable= false)
-    private int montoTotal;
-
+    private BigDecimal montoTotal;
 }
