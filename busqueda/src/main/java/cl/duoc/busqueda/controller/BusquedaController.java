@@ -15,6 +15,7 @@ import cl.duoc.busqueda.service.BusquedaService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
+
 @RestController
 @RequestMapping("/v1/busqueda")
 @Slf4j
@@ -22,6 +23,17 @@ public class BusquedaController {
 
     @Autowired
     private BusquedaService busquedaService;
+
+   @GetMapping("/{codigo}")
+    public ResponseEntity<BusquedaResponse> buscarPorCodigo(@PathVariable String codigo) {
+        log.info("Consultando codigo de seguimiento: {}", codigo);
+        BusquedaResponse respuesta = busquedaService.obtenerSeguimientoCompleto(codigo);
+        return ResponseEntity.ok(respuesta);
+    }
+    
+
+
+
 
     @PostMapping("/rastrear")
     public ResponseEntity<BusquedaResponse> rastrearPedido(@Valid @RequestBody BusquedaRequest request) {

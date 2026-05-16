@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class BusquedaResponse {
     private Long id;
     private String codigoSeguimiento;
-
+    private Long envioId;
     private String estadoEnvio;       
     private String nombreProducto; 
     private String detalle;

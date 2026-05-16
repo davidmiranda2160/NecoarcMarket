@@ -13,6 +13,7 @@ public class BusquedaMapper {
     public Busqueda fromRequest(BusquedaRequest request){
         return Busqueda.builder()
                 .codigoSeguimiento(request.getCodigoSeguimiento())
+                .envioId(request.getEnvioId())
                 .estadoEnvio(request.getEstadoEnvio())
                 .detalle(request.getDetalle())
                 .fechaActualizacionProducto(java.time.LocalDateTime.now())
@@ -22,6 +23,7 @@ public class BusquedaMapper {
             return BusquedaResponse.builder()
                     .id(busqueda.getId())
                     .codigoSeguimiento(busqueda.getCodigoSeguimiento())
+                    .envioId(busqueda.getEnvioId())    
                     .estadoEnvio(nombre)
                     .detalle(busqueda.getDetalle())
                     .fechaActualizacionProducto(busqueda.getFechaActualizacionProducto())

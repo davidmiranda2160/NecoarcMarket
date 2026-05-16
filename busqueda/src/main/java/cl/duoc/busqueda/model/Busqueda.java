@@ -27,6 +27,10 @@ public class Busqueda {
     @Column(name = "codigo_seguimiento", unique = true)
     private String codigoSeguimiento;
 
+    //añado comentario para que no se me olvide que acá usaré esto para conectar con envios de david
+    @Column(name = "envio_id", nullable = false)
+    private Long envioId;
+
     @Column(name = "estado_envio")
     private String estadoEnvio;
 

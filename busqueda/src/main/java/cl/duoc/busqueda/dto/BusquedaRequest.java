@@ -3,6 +3,7 @@ package cl.duoc.busqueda.dto;
 import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,10 @@ public class BusquedaRequest {
     private String codigoSeguimiento;
 
     @NotBlank(message = "El estado de envío no puede estar vacío")
-    private String estadoEnvio;    
+    private String estadoEnvio;   
+    
+    @NotNull(message = "El ID de envío externo es obligatorio")
+    private Long envioId;
     
     @NotBlank(message = "El nombre del producto no puede estar vacío")
     private String nombreProducto; 
