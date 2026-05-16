@@ -18,7 +18,7 @@ import cl.duoc.envio.service.EnvioService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/envio")
+@RequestMapping("v1/envio")
 public class EnvioController {
 
     @Autowired
