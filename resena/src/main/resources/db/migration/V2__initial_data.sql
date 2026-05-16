@@ -1,4 +1,3 @@
---un null en fecha le da la chiripiorca a la base de datos
 INSERT INTO resena (producto_id, usuario_id, calificacion, comentario, fecha_creacion) 
 VALUES (1, 1, 5, '¡La figura de Neco-Arc es excelente! Muy detallada.', '2026-05-10 21:45:00');
 
