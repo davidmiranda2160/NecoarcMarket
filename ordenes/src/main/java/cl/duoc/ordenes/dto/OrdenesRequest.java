@@ -15,9 +15,6 @@ public class OrdenesRequest {
     @NotNull(message= "El id de usuario es obligatorio")
     private Long idUsuario;
 
-    @NotNull(message= "El id de envio es obligatorio")
-    private Long idEnvio;
-
     @NotBlank(message="La direccion de envio es obligatoria")
     private String direccionEnvio;
 

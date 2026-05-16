@@ -1,13 +1,18 @@
 package cl.duoc.ordenes.dto;
 
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.Map;
+
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class ApiErrorResponse {
-    private int status;      
-    private String message; 
+    private LocalDateTime timestamp;
+    private int status;
+    private String error;
+    private String message;
+    private String path;
+    private Map<String, String> errors;
 }

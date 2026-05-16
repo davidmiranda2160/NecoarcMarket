@@ -1,9 +1,12 @@
 package cl.duoc.ordenes.client;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import cl.duoc.ordenes.dto.UsuarioResponse;
 import lombok.extern.slf4j.Slf4j; 
@@ -12,22 +15,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UsuarioClient {
 
-    @Autowired
-    private WebClient webClient;
+    private final WebClient webClient;
 
-    @Value("${services.usuario.baseUrl}$")
-    private String usuarioUrl;
+    public UsuarioClient(WebClient.Builder builder, @Value("${services.usuario.baseUrl}") String baseUrl) {
+        this.webClient = builder.baseUrl(baseUrl).build();
+    }
 
-    public UsuarioResponse obtenerUsuarioPorId(Long id){
+    public UsuarioResponse obtenerUsuarioPorId(Long id) {
         try {
             return webClient.get()
-                    .uri(usuarioUrl + "/{id}", id)
+                    .uri("/v1/usuario/{id}", id)
                     .retrieve()
                     .bodyToMono(UsuarioResponse.class)
                     .block();
-        } catch (Exception e) {
-            log.error("Error al comunicarse con el servicio de usuarios");
-            return null;
+        } catch (WebClientResponseException ex) {
+            if (ex.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+                throw new NoSuchElementException("Usuario con ID " + id + " no encontrado.");
+            }
+            throw new RuntimeException("Error en servicio de usuarios");
         }
     }
 }

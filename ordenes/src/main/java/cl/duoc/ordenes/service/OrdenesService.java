@@ -2,7 +2,7 @@ package cl.duoc.ordenes.service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +17,14 @@ import cl.duoc.ordenes.dto.EnvioRequest;
 import cl.duoc.ordenes.dto.EnvioResponse;
 import cl.duoc.ordenes.dto.OrdenesRequest;
 import cl.duoc.ordenes.dto.OrdenesResponse;
+import cl.duoc.ordenes.dto.OrdenesUpdateRequest;
 import cl.duoc.ordenes.dto.PagosRequest;
 import cl.duoc.ordenes.dto.PagosResponse;
 import cl.duoc.ordenes.dto.UsuarioResponse;
 import cl.duoc.ordenes.mapper.OrdenesMapper;
 import cl.duoc.ordenes.model.Ordenes;
 import cl.duoc.ordenes.repository.OrdenesRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -47,38 +49,54 @@ public class OrdenesService {
     @Autowired
     private OrdenesMapper ordenesMapper;
 
+    @Transactional
     public OrdenesResponse crearOrden(OrdenesRequest request) {
-        log.info("Inciando proceso para crear la orden para el usuario {}", request.getIdUsuario());
+        log.info("Iniciando proceso de orden para usuario: {}", request.getIdUsuario());
 
-        CarritoResponse carrito = carritoClient.buscarUsuarioPorId(request.getIdUsuario());
-        if (carrito == null || carrito.getCantidad() == 0) {
-            log.warn("el carrito del usuario {} esta vacio. no se puede procesar", request.getIdUsuario());
-            return null;
+        CarritoResponse carrito = carritoClient.buscarCarritoPorUsuarioId(request.getIdUsuario());
+
+        if (carrito.getMontoTotal().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("No se puede crear una orden con monto cero.");
         }
-
-        BigDecimal montoTotal = carrito.getMontoTotal();
 
         UsuarioResponse usuario = usuarioClient.obtenerUsuarioPorId(request.getIdUsuario());
 
-        //En esta parte registramos la orden en la base con el estado incial como pendiente
-        Ordenes ordenEstadoInicial = ordenesMapper.fromRequest(request, montoTotal);
-        Ordenes ordenGuardada = ordenesRepository.save(ordenEstadoInicial);
+        Ordenes orden = ordenesMapper.fromRequest(request, carrito.getMontoTotal());
+        orden.setEstadoOrden("PENDIENTE");
+        orden = ordenesRepository.save(orden);
 
         PagosRequest pagosRequest = new PagosRequest();
         pagosRequest.setMetodoPago(request.getMetodoPago());
-        pagosRequest.setMontoAPagar(montoTotal != null ? montoTotal.doubleValue() : 0.0);
+        pagosRequest.setMontoAPagar(carrito.getMontoTotal().doubleValue());
+
         PagosResponse pagosResponse = pagosClient.procesarPago(pagosRequest);
 
+        // 5. Generar Envío
         EnvioRequest envioRequest = new EnvioRequest();
         envioRequest.setEmpresaTransporte(request.getEmpresaTransporte());
         envioRequest.setDireccionDestino(request.getDireccionEnvio());
+
         EnvioResponse envioResponse = envioClient.crearEnvio(envioRequest);
 
-        ordenGuardada.setIdPago(pagosResponse.getId());
-        ordenGuardada.setEstadoOrden("Pagado");
-        Ordenes orden = ordenesRepository.save(ordenGuardada);
+        orden.setIdPago(pagosResponse.getId());
+        orden.setIdEnvio(envioResponse.getId());
+        orden.setEstadoOrden("PAGADO");
+        Ordenes ordenFinalizada = ordenesRepository.save(orden);
 
-        return ordenesMapper.toResponse(orden, usuario, envioResponse, pagosResponse);
+        carritoClient.vaciarCarrito(request.getIdUsuario());
+
+        log.info("Orden {} creada y pagada exitosamente", ordenFinalizada.getId());
+        return ordenesMapper.toResponse(ordenFinalizada, usuario, envioResponse, pagosResponse);
+    }
+
+    public OrdenesResponse obtenerPorId(Long id) {
+        Ordenes orden = ordenesRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("La orden con ID " + id + " no existe."));
+        UsuarioResponse usuario = usuarioClient.obtenerUsuarioPorId(orden.getIdUsuario());
+        PagosResponse pagos = pagosClient.obtenerPagoPorOrden(orden.getId());
+        EnvioResponse envio = envioClient.obtenerEnvioPorId(orden.getIdEnvio());
+
+        return ordenesMapper.toResponse(orden, usuario, envio, pagos);
     }
 
     public List<OrdenesResponse> listarTodas() {
@@ -87,54 +105,38 @@ public class OrdenesService {
                 .collect(Collectors.toList());
     }
 
-    public OrdenesResponse obtenerPorId(Long id) {
-        Optional<Ordenes> ordenBuscar = ordenesRepository.findById(id);
-
-        if (ordenBuscar.isPresent()) {
-            Ordenes orden = ordenBuscar.get();
-
-            UsuarioResponse usuario = usuarioClient.obtenerUsuarioPorId(id);
-            PagosResponse pagos = pagosClient.obtenerPagoPorOrden(orden.getId());
-            EnvioResponse envio = envioClient.obtenerEnvioPorId(orden.getIdEnvio());
-            return ordenesMapper.toResponse(orden, usuario, envio, pagos);
-        }
-        return null;
-    }
-
-    public OrdenesResponse actualizarOrden(Long id, OrdenesRequest request) {
-        return ordenesRepository.findById(id).map(ordenExistente -> {
-            ordenExistente.setIdUsuario(request.getIdUsuario());
-
-            ordenExistente.setIdEnvio(request.getIdEnvio());
-
-            Ordenes ordenGuardada = ordenesRepository.save(ordenExistente);
-
-            UsuarioResponse usuario = usuarioClient.obtenerUsuarioPorId(ordenGuardada.getIdUsuario());
-            PagosResponse pagos = pagosClient.obtenerPagoPorOrden(ordenGuardada.getId());
-            EnvioResponse envio = envioClient.obtenerEnvioPorId(ordenGuardada.getIdEnvio());
-
-            return ordenesMapper.toResponse(ordenGuardada, usuario, envio, pagos);
-
-        }).orElse(null);
-    }
-
+    @Transactional
     public boolean eliminarOrden(Long id) {
-        if (ordenesRepository.existsById(id)) {
-            ordenesRepository.deleteById(id);
-            return true;
+        if (!ordenesRepository.existsById(id)) {
+            throw new NoSuchElementException("No se puede eliminar: La orden " + id + " no existe.");
         }
-        return false;
+        ordenesRepository.deleteById(id);
+        return true;
     }
 
     public List<OrdenesResponse> listarPorUsuario(Long idUsuario) {
         return ordenesRepository.findByIdUsuario(idUsuario).stream()
                 .map(orden -> {
                     UsuarioResponse usuario = usuarioClient.obtenerUsuarioPorId(orden.getIdUsuario());
-                    PagosResponse pagos = pagosClient.obtenerPagoPorOrden(orden.getId());
-                    EnvioResponse envio = envioClient.obtenerEnvioPorId(orden.getIdEnvio());
-
-                    return ordenesMapper.toResponse(orden, usuario, envio, pagos);
+                    return ordenesMapper.toResponse(orden, usuario, null, null);
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public OrdenesResponse actualizarOrden(Long id, OrdenesUpdateRequest request) {
+
+        Ordenes ordenExistente = ordenesRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("La orden con ID " + id + " no existe."));
+
+        ordenExistente.setDireccionEnvio(request.getDireccionEnvio());
+
+        if (request.getEmpresaTransporte() != null) {
+            log.info("Actualizando empresa de transporte a: {}", request.getEmpresaTransporte());
+        }
+
+        Ordenes guardada = ordenesRepository.save(ordenExistente);
+
+        return ordenesMapper.toResponse(guardada, null, null, null);
     }
 }
