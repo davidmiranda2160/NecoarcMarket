@@ -1,13 +1,13 @@
 package cl.duoc.pagos.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,31 +26,22 @@ public class PagosController {
     @Autowired
     private PagosService pagosService;
 
-    @GetMapping("/{id}")
-    public PagosResponse obtenerCarritoPorUsuario(@PathVariable Long idOrden) {
-        return pagosService.obtenerPagoPorOrden(idOrden);
+    @GetMapping
+    public ResponseEntity<List<PagosResponse>> listarTodos() {
+        log.info("Petición recibida para listar todos los pagos");
+        return ResponseEntity.ok(pagosService.listarTodosLosPagos());
+    }
+
+    @GetMapping("/orden/{id}")
+    public ResponseEntity<PagosResponse> obtenerPagoPorIdOrden(@PathVariable("id") Long id) {
+        log.info("Buscando pago asociado a la orden ID: {}", id);
+        return ResponseEntity.ok(pagosService.obtenerPagoPorOrden(id));
     }
 
     @PostMapping
     public ResponseEntity<PagosResponse> procesarPago(@Valid @RequestBody PagosRequest request) {
-        log.info("");
+        log.info("Procesando nuevo pago para la orden: {}", request.getIdOrden());
         return ResponseEntity.status(HttpStatus.CREATED).body(pagosService.procesarPago(request));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<PagosResponse> actualizarPago(@PathVariable Long id,
-            @Valid @RequestBody PagosRequest request) {
-        log.info("", id);
-        return ResponseEntity
-                .ok()
-                .body(pagosService.actualizarPago(id, request));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarPago(@PathVariable Long id) {
-        log.info("", id);
-        pagosService.eliminarPago(id);
-        return ResponseEntity.noContent().build();
     }
 
 }

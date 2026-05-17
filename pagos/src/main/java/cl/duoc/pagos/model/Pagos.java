@@ -1,6 +1,6 @@
 package cl.duoc.pagos.model;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,21 +24,21 @@ public class Pagos {
     private Long id;
 
     
-    @Column(nullable= false)
+    @Column(name= "id_orden", nullable= false)
     private Long idOrden; 
 
-    @Column(nullable= false)
+    @Column(name= "metodo_pago", nullable= false)
     private String metodoPago;
 
-    @Column(nullable= false)
+    @Column(name = "monto_a_pagar", nullable = false)
     private double montoAPagar;
 
-    @Column(nullable= false)
+    @Column(name = "monto_pagado",nullable= false)
     private double montoPagado;
 
-    @Column(nullable= false)
-    private Date fechaTransaccion;
+    @Column(name= "fecha_transaccion", nullable= false)
+    private LocalDateTime fechaTransaccion;
 
-    @Column(nullable= false)
+    @Column(name= "estado_pago", nullable= false)
     private String estadoPago;
 }

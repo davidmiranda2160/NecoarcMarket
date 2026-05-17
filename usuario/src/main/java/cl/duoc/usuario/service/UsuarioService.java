@@ -6,6 +6,9 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cl.duoc.usuario.Client.PagosClient;
+import cl.duoc.usuario.dto.PagosRequest;
+import cl.duoc.usuario.dto.PagosResponse;
 import cl.duoc.usuario.dto.UsuarioRequest;
 import cl.duoc.usuario.dto.UsuarioResponse;
 import cl.duoc.usuario.mapper.UsuarioMapper;
@@ -23,35 +26,38 @@ public class UsuarioService {
     private UsuarioRespository usuarioRespository;
 
     @Autowired
+    private PagosClient pagosClient;
+
+    @Autowired
     private UsuarioMapper usuarioMapper;
 
-    public List<Usuario> listarUsuarios(){
+    public List<Usuario> listarUsuarios() {
         log.info("Buscando todos los usuarios");
         return usuarioRespository.findAll();
     }
-    
-    public UsuarioResponse crearUsuario(UsuarioRequest request){
+
+    public UsuarioResponse crearUsuario(UsuarioRequest request) {
         log.info("Intentando crear al usuario con correo: {}", request.getCorreo());
-        
+
         Usuario usuario = usuarioMapper.fromRequest(request);
         Usuario usuarioGuardado = usuarioRespository.save(usuario);
-        
+
         log.info("Usuario creado exitosamente");
         return usuarioMapper.toResponse(usuarioGuardado);
     }
 
     public UsuarioResponse obtenerUsuarioPorId(Long id) {
         log.info("Buscando usuario con ID: {}", id);
-        
+
         Usuario usuario = usuarioRespository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("No se encontró el usuario con id: " + id));
-        
+
         return usuarioMapper.toResponse(usuario);
     }
 
     public UsuarioResponse actualizarUsuario(Long id, UsuarioRequest datosNuevos) {
         log.info("Buscando usuario con ID: {} para actualizar", id);
-        
+
         Usuario usuarioExistente = usuarioRespository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("No existe el usuario " + id + " a actualizar"));
 
@@ -82,12 +88,24 @@ public class UsuarioService {
 
     public void eliminarUsuarioPorId(Long id) {
         log.info("Intentando eliminar usuario con ID: {}", id);
-        
+
         if (!usuarioRespository.existsById(id)) {
             throw new NoSuchElementException("No se pudo encontrar al usuario con id: " + id + " para eliminar");
         }
-        
+
         usuarioRespository.deleteById(id);
         log.info("Usuario eliminado correctamente");
     }
+
+    public PagosResponse solicitarPago(Long usuarioId, PagosRequest request) {
+        usuarioRespository.findById(usuarioId)
+                .orElseThrow(() -> new NoSuchElementException("No existe el usuario con ID: " + usuarioId));
+
+        return pagosClient.crearPago(request);
+    }
+
+    public List<PagosResponse> obtenerHistorialPagos() {
+        return pagosClient.listarPagos();
+    }
+
 }

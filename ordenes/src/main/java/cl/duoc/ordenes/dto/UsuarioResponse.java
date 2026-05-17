@@ -1,7 +1,5 @@
 package cl.duoc.ordenes.dto;
 
-import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CarritoResponse {
+public class UsuarioResponse {
     private Long id;
-    private Integer cantidad;
-    private BigDecimal montoTotal;
-    private UsuarioResponse usuario;
-    private ProductoResponse producto;
+    private String nombre;
+    private String apellidos;
+    private String correo;
+    private String direccion;
+    private String telefono;
+    private String tipoUsuario;
 }

@@ -1,6 +1,8 @@
 package cl.duoc.pagos.service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,12 +26,19 @@ public class PagosService {
 
     public PagosResponse procesarPago(PagosRequest request) {
         try {
+            if (pagosRepository.existsByIdOrden(request.getIdOrden())) {
+                log.warn("Intento de duplicar pago para la orden ID: {}", request.getIdOrden());
+                throw new IllegalStateException("Ya existe un pago registrado para la orden: " + request.getIdOrden());
+            }
+
             Pagos pago = pagosMapper.fromRequest(request);
             Pagos pagoGuardado = pagosRepository.save(pago);
 
-            log.info("Pago realizado");
+            log.info("Pago procesado exitosamente para la orden: {}", request.getIdOrden());
             return pagosMapper.toResponse(pagoGuardado);
 
+        } catch (IllegalStateException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Error al crear el registro de pago: {}", e.getMessage());
             throw new RuntimeException("No se pudo procesar el pago");
@@ -37,31 +46,18 @@ public class PagosService {
     }
 
     public PagosResponse obtenerPagoPorOrden(Long idOrden) {
+        log.info("Buscando pago asociado a la orden: {}", idOrden);
         Pagos pago = pagosRepository.findByIdOrden(idOrden)
-                .orElseThrow(() -> new NoSuchElementException("No se encontro un pago para el id: " + idOrden));
+                .orElseThrow(() -> new NoSuchElementException("No se encontró un pago para la orden: " + idOrden));
 
         return pagosMapper.toResponse(pago);
     }
 
-    public PagosResponse actualizarPago(Long id, PagosRequest request) {
-
-        Pagos pago = pagosRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No se puede actualizar el pago: " + id));
-
-        pago.setMetodoPago(request.getMetodoPago());
-
-        Pagos actualizado = pagosRepository.save(pago);
-        log.info("Pago actualizado correctamente");
-        return pagosMapper.toResponse(actualizado);
+    public List<PagosResponse> listarTodosLosPagos() {
+        log.info("Obteniendo todos los registros de pago de la base de datos");
+        return pagosRepository.findAll()
+                .stream()
+                .map(pagosMapper::toResponse)
+                .collect(Collectors.toList());
     }
-
-    public void eliminarPago(Long id) {
-        if (!pagosRepository.existsById(id)) {
-            throw new NoSuchElementException("No se puede eliminar: " + id);
-        }
-
-        pagosRepository.deleteById(id);
-        log.warn("Se ha eliminado el registro de pago con id: ", id);
-    }
-
 }

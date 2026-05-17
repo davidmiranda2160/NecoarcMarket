@@ -1,7 +1,6 @@
-package cl.duoc.pagos.dto;
+package cl.duoc.usuario.dto;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +17,6 @@ public class PagosResponse {
     private String metodoPago;
     private double montoAPagar;
     private double montoPagado;
-    private LocalDateTime fechaTransaccion;
+    private Date fechaTransaccion;
     private String estadoPago;
 }

@@ -1,4 +1,4 @@
-package cl.duoc.pagos.dto;
+package cl.duoc.usuario.dto;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PagosRequest {
     @NotNull(message = "El ID de la orden es obligatorio")
-    private Long idOrden; // Añadido para que la DB no falle [cite: 95]
+    private Long idOrden; // Añadido para que la DB no falle
 
     @NotBlank(message= "El metodo de pago es obligatorio")
     private String metodoPago;
@@ -22,4 +22,5 @@ public class PagosRequest {
     @NotNull(message= "El monto es obligatorio")
     @Column(nullable= false)
     private double montoAPagar;
+
 }

@@ -20,7 +20,7 @@ public class CarritoClient {
     public List<CarritoResponse> obtenerCarritoPorUsuario(Long idUsuario){
         log.info("Obteniendo carrito del usuario {}", idUsuario);
         return webClient.get()
-                .uri("/usuario/{id}", idUsuario)
+                .uri("/usuario/{idUsuario}", idUsuario)
                 .retrieve()
                 .bodyToFlux(CarritoResponse.class)
                 .collectList()

@@ -8,7 +8,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-//Se deja configurado el webClient para mas tarde 
     @Value("${services.ordenes.baseUrl}")
     private String baseUrl;
 
