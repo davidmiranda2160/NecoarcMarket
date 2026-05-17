@@ -1,7 +1,7 @@
 package cl.duoc.ordenes.model;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,33 +16,24 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name= "ordenes")
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "ordenes")
 @Builder
 public class Ordenes {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable= false)
-    private Long idUsuario;
-
-    @Column(nullable= false)
-    private Long idEnvio;
-
-    @Column(nullable= false)
-    private Date fechaCreacion;
+    private Long usuarioId;
 
     @Column(nullable= false)
     private String estadoOrden;
 
-    @Column(nullable= false)
-    private BigDecimal montoTotal;
+    @Column(nullable=false)
+    private BigDecimal total;
 
     @Column(nullable= false)
-    private String direccionEnvio;
-
-    @Column(nullable= false)
-    private Long idPago;
+    private LocalDateTime fechaOrden;
 }

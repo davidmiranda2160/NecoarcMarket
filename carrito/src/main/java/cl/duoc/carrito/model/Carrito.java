@@ -31,7 +31,7 @@ public class Carrito {
     private Long idProducto; 
 
     @Column(nullable= false)
-    private int cantidad;
+    private Integer cantidad;
 
     @Column(nullable= false)
     private BigDecimal montoTotal;

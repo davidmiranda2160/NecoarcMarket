@@ -87,7 +87,7 @@ public class CarritoService {
                 .collect(Collectors.toList());
     }
 
-    public CarritoResponse actualizarCantidad(Long id, int nuevaCantidad, BigDecimal nuevoMonto) {
+    public CarritoResponse actualizarCantidad(Long id, Integer nuevaCantidad, BigDecimal nuevoMonto) {
         log.info("Actualizando unidades del ítem de carrito ID: {}", id);
 
         if (nuevaCantidad <= 0) {

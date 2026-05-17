@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CarritoResponse {
     private Long id;
-    private int cantidad;
+    private Integer cantidad;
     private BigDecimal montoTotal;
     private UsuarioResponse usuario; 
     private ProductoResponse producto;

@@ -1,41 +1,42 @@
 package cl.duoc.ordenes.mapper;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Component;
 
-import cl.duoc.ordenes.dto.EnvioResponse;
 import cl.duoc.ordenes.dto.OrdenesRequest;
 import cl.duoc.ordenes.dto.OrdenesResponse;
-import cl.duoc.ordenes.dto.PagosResponse;
-import cl.duoc.ordenes.dto.UsuarioResponse;
 import cl.duoc.ordenes.model.Ordenes;
 
 @Component
 public class OrdenesMapper {
 
-     public Ordenes fromRequest(OrdenesRequest request, BigDecimal montoTotal) {
+    public Ordenes fromRequest(OrdenesRequest request, BigDecimal totalCalculado){
+        if(request == null){
+            return null;
+        }
+
         return Ordenes.builder()
-                .idUsuario(request.getIdUsuario())
-                .direccionEnvio(request.getDireccionEnvio())
-                .montoTotal(montoTotal)
-                .estadoOrden("Pendiente")
+                .usuarioId(request.getUsuarioId())
+                .total(totalCalculado)
+                .estadoOrden("pendiente")
+                .fechaOrden(LocalDateTime.now())
                 .build();
     }
 
-    public OrdenesResponse toResponse(Ordenes ordenes, UsuarioResponse usuario,
-        EnvioResponse envio, PagosResponse pagos
-    ) {
+    public OrdenesResponse toResponse(Ordenes ordenes){
+        if(ordenes == null){
+            return null;
+        }
+
         return OrdenesResponse.builder()
-                .id(ordenes.getId())
-                .idUsuario(ordenes.getIdUsuario())
-                .fechaCreacion(ordenes.getFechaCreacion())
-                .estadoOrden(ordenes.getEstadoOrden())
-                .montoTotal(ordenes.getMontoTotal())
-                .direccionEnvio(ordenes.getDireccionEnvio())
-                .usuario(usuario)
-                .envio(envio)
-                .pagos(pagos)
-                .build();
+            .id(ordenes.getId())
+            .usuarioId(ordenes.getUsuarioId())
+            .total(ordenes.getTotal())
+            .estadoOrden(ordenes.getEstadoOrden())
+            .fechaOrden(ordenes.getFechaOrden())
+            .build();
     }
+
 }

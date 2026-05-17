@@ -11,8 +11,6 @@ import org.springframework.web.context.request.WebRequest;
 
 import cl.duoc.ordenes.dto.ApiErrorResponse;
 
-;
-
 @RestControllerAdvice
 public class GlobalHandlerException {
 
@@ -40,5 +38,20 @@ public class GlobalHandlerException {
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
         return new ResponseEntity<>(error, status);
+    }
+
+    @ExceptionHandler(org.springframework.web.reactive.function.client.WebClientResponseException.class)
+    public ResponseEntity<ApiErrorResponse> handleWebClientError(org.springframework.web.reactive.function.client.WebClientResponseException ex, WebRequest request) {
+        return buildResponse(
+                (HttpStatus) ex.getStatusCode(),
+                "Error al comunicarse con el servicio externo: " + ex.getResponseBodyAsString(),
+                request
+        );
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorResponse> handleValidation(org.springframework.web.bind.MethodArgumentNotValidException ex, WebRequest request) {
+        String mensaje = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+        return buildResponse(HttpStatus.BAD_REQUEST, mensaje, request);
     }
 }

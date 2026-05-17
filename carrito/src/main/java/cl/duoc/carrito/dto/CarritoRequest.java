@@ -21,7 +21,7 @@ ya que es algo que el sistema generara de manera automatica
 */
 
     @Min(value = 1, message = "La cantidad mínima es 1")
-    private int cantidad;
+    private Integer cantidad;
 
     @Min(value = 0, message = "El monto total no puede ser negativo")
     private BigDecimal montoTotal;

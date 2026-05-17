@@ -1,19 +1,13 @@
 package cl.duoc.ordenes.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import cl.duoc.ordenes.model.Ordenes;
+import java.util.List;
 
-@Repository
-public interface OrdenesRepository extends JpaRepository<Ordenes, Long> {
-    //Metodo para listar las ordenes de un usuario especifico
-    List<Ordenes> findByIdUsuario(Long idUsuario);
 
-    /*Metodo para buscar ordenes por su estado
-    List<Ordenes> findByEstadoOrden(String estadoOrden);
-    */
-    
+public interface  OrdenesRepository extends JpaRepository<Ordenes, Long> {
+
+    //Metodo para buscar el historial de usuario
+    List<Ordenes> findByUsuarioId(Long usuarioId);
 }
