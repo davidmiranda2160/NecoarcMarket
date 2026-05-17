@@ -27,7 +27,7 @@ public class PagosClient {
     public PagosResponse crearPago(PagosRequest request) {
         try {
             return this.webClient.post()
-                    .uri("/pagos")
+                    .uri("/v1/pagos/crear")
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(PagosResponse.class)
