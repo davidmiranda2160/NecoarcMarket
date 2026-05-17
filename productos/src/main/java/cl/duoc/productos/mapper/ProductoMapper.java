@@ -19,21 +19,22 @@ public class ProductoMapper {
                 .build();
     }
 
-    //En caso de que ya no haya stock
+
     public ProductoResponse toResponse(Producto producto){
         return toResponse(producto, 0); 
     }
-
-
+    //Con esto bajamos os ubimos la bandera
     public ProductoResponse toResponse(Producto producto, Integer stockReal){
+        boolean estaActivo = (stockReal != null && stockReal > 0);
+
         return ProductoResponse.builder()
                 .id(producto.getId())
                 .nombrep(producto.getNombrep())
                 .descripcion(producto.getDescripcion())
                 .precio(producto.getPrecio())
-                .stock(stockReal)//Vinculo a inventario
+                .stock(stockReal) // Vínculo a inventario
                 .categoria(producto.getCategoria())
-                .activo(producto.getActivo())
+                .activo(estaActivo) 
                 .vendedorId(producto.getVendedorId())
                 .build();
     }

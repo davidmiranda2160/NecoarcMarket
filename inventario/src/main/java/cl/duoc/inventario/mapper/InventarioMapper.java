@@ -35,7 +35,5 @@ public class InventarioMapper {
                 .nombre(producto.getNombrep())
                 .cantidad(inventario.getCantidad())
                 .build();
-
-
     }
 }

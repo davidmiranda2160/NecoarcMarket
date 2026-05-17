@@ -2,9 +2,11 @@ package cl.duoc.ordenes.mapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import cl.duoc.ordenes.dto.CarritoResponse;
 import cl.duoc.ordenes.dto.OrdenesRequest;
 import cl.duoc.ordenes.dto.OrdenesResponse;
 import cl.duoc.ordenes.model.Ordenes;
@@ -25,18 +27,19 @@ public class OrdenesMapper {
                 .build();
     }
 
-    public OrdenesResponse toResponse(Ordenes ordenes){
+    public OrdenesResponse toResponse(Ordenes ordenes, List<CarritoResponse> itemsCarrito){
         if(ordenes == null){
             return null;
         }
 
         return OrdenesResponse.builder()
-            .id(ordenes.getId())
-            .usuarioId(ordenes.getUsuarioId())
-            .total(ordenes.getTotal())
-            .estadoOrden(ordenes.getEstadoOrden())
-            .fechaOrden(ordenes.getFechaOrden())
-            .build();
+                .id(ordenes.getId())
+                .usuarioId(ordenes.getUsuarioId())
+                .total(ordenes.getTotal())
+                .estadoOrden(ordenes.getEstadoOrden())
+                .fechaOrden(ordenes.getFechaOrden())
+                .items(itemsCarrito) //con este mostramos el carrito en la orden
+                .build();
     }
 
 }
