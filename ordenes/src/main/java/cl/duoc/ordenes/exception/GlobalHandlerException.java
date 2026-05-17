@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import cl.duoc.ordenes.dto.ApiErrorResponse;
 
@@ -24,9 +25,29 @@ public class GlobalHandlerException {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
+    @ExceptionHandler(WebClientResponseException.class)
+    public ResponseEntity<ApiErrorResponse> handleWebClientError(WebClientResponseException ex, WebRequest request) {
+        // Obtenemos el status de forma segura
+        HttpStatus status = HttpStatus.resolve(ex.getStatusCode().value());
+        if (status == null) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        return buildResponse(
+                status,
+                "Error en servicio externo: " + ex.getResponseBodyAsString(),
+                request
+        );
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorResponse> handleValidation(org.springframework.web.bind.MethodArgumentNotValidException ex, WebRequest request) {
+        String mensaje = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+        return buildResponse(HttpStatus.BAD_REQUEST, mensaje, request);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGlobalError(Exception ex, WebRequest request) {
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno en el proceso de orden", request);
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno en el proceso de orden: " + ex.getMessage(), request);
     }
 
     private ResponseEntity<ApiErrorResponse> buildResponse(HttpStatus status, String message, WebRequest request) {
@@ -38,20 +59,5 @@ public class GlobalHandlerException {
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
         return new ResponseEntity<>(error, status);
-    }
-
-    @ExceptionHandler(org.springframework.web.reactive.function.client.WebClientResponseException.class)
-    public ResponseEntity<ApiErrorResponse> handleWebClientError(org.springframework.web.reactive.function.client.WebClientResponseException ex, WebRequest request) {
-        return buildResponse(
-                (HttpStatus) ex.getStatusCode(),
-                "Error al comunicarse con el servicio externo: " + ex.getResponseBodyAsString(),
-                request
-        );
-    }
-
-    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorResponse> handleValidation(org.springframework.web.bind.MethodArgumentNotValidException ex, WebRequest request) {
-        String mensaje = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
-        return buildResponse(HttpStatus.BAD_REQUEST, mensaje, request);
     }
 }

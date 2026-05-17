@@ -1,4 +1,5 @@
-package cl.duoc.pagos.dto;
+package cl.duoc.ordenes.dto;
+
 
 import java.math.BigDecimal;
 
@@ -22,5 +23,6 @@ public class PagosRequest {
     private String metodoPago;
 
     @NotNull(message= "El monto es obligatorio")
+    @Column(nullable= false)
     private BigDecimal montoAPagar;
 }

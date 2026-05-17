@@ -21,11 +21,11 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/v1/carrito") 
+@RequestMapping("/v1/carrito")
 @Slf4j
 public class CarritoController {
 
-    @Autowired 
+    @Autowired
     private CarritoService carritoService;
 
     @GetMapping("/usuario/{idUsuario}")
@@ -40,7 +40,7 @@ public class CarritoController {
             @PathVariable Long idProducto,
             @Valid @RequestBody CarritoRequest request) {
         log.info("POST /v1/carrito/{}/{} - Intentando agregar producto", idUsuario, idProducto);
-        
+
         CarritoResponse response = carritoService.agregarProducto(request, idUsuario, idProducto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -49,7 +49,7 @@ public class CarritoController {
     public ResponseEntity<CarritoResponse> actualizarCarrito(@PathVariable Long id,
             @Valid @RequestBody CarritoRequest request) {
         log.info("PUT /v1/carrito/{} - Actualizando cantidades", id);
-        
+
         CarritoResponse response = carritoService.actualizarCantidad(id, request.getCantidad(), request.getMontoTotal());
         return ResponseEntity.ok(response);
     }
@@ -57,8 +57,15 @@ public class CarritoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProductoPorId(@PathVariable Long id) {
         log.info("DELETE /v1/carrito/{} - Eliminando ítem", id);
-        
+
         carritoService.eliminarProductoPorId(id);
-        return ResponseEntity.noContent().build(); 
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/usuario/{idUsuario}")
+    public ResponseEntity<Void> limpiarCarrito(@PathVariable Long idUsuario) {
+        log.info("Vaciando carrito del usuario: {}", idUsuario);
+        carritoService.vaciarCarrito(idUsuario);
+        return ResponseEntity.noContent().build();
     }
 }

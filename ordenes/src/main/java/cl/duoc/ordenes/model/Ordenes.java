@@ -25,15 +25,15 @@ public class Ordenes {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable= false)
+    @Column(name= "usuario_id", nullable= false)
     private Long usuarioId;
 
-    @Column(nullable= false)
+    @Column(name="estado_orden", nullable= false)
     private String estadoOrden;
 
-    @Column(nullable=false)
+    @Column(name= "total", nullable=false)
     private BigDecimal total;
 
-    @Column(nullable= false)
+    @Column(name= "fecha_orden", nullable= false)
     private LocalDateTime fechaOrden;
 }

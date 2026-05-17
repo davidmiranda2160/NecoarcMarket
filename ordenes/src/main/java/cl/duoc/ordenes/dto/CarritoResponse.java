@@ -15,6 +15,5 @@ public class CarritoResponse {
     private Long id;
     private Integer cantidad;
     private BigDecimal montoTotal;
-    private UsuarioResponse usuario;
     private ProductoResponse producto;
 }

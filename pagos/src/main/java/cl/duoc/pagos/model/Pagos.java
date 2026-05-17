@@ -1,5 +1,6 @@
 package cl.duoc.pagos.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -12,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Entity
 @Data
 @Table(name= "pagos")
@@ -31,10 +33,10 @@ public class Pagos {
     private String metodoPago;
 
     @Column(name = "monto_a_pagar", nullable = false)
-    private double montoAPagar;
+    private BigDecimal montoAPagar;
 
     @Column(name = "monto_pagado",nullable= false)
-    private double montoPagado;
+    private BigDecimal montoPagado;
 
     @Column(name= "fecha_transaccion", nullable= false)
     private LocalDateTime fechaTransaccion;

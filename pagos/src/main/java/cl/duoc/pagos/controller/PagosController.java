@@ -19,7 +19,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/pagos")
+@RequestMapping("v1/pagos")
 @Slf4j
 public class PagosController {
 
@@ -38,7 +38,7 @@ public class PagosController {
         return ResponseEntity.ok(pagosService.obtenerPagoPorOrden(id));
     }
 
-    @PostMapping
+    @PostMapping("/crear")
     public ResponseEntity<PagosResponse> procesarPago(@Valid @RequestBody PagosRequest request) {
         log.info("Procesando nuevo pago para la orden: {}", request.getIdOrden());
         return ResponseEntity.status(HttpStatus.CREATED).body(pagosService.procesarPago(request));

@@ -1,4 +1,4 @@
-package cl.duoc.pagos.dto;
+package cl.duoc.ordenes.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,9 +9,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class PagosResponse {
     private Long id;
     private Long idOrden; 

@@ -21,6 +21,13 @@ import cl.duoc.carrito.repository.CarrritoRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
+/*
+Este capa se encarga de gestionar la logica del negocio del carrito de compras
+es quien se encarga de las operaciones CRUD en la base de datos local y la forma 
+y la comunicacion con los microservicios de Usuario y Productos, todo es 
+transaccional lo que garantiza consistencia en los datos
+
+*/
 @Service
 @Slf4j
 @Transactional 
@@ -37,6 +44,12 @@ public class CarritoService {
 
     @Autowired
     private UsuarioClient usuarioClient;
+
+    /*
+    
+    Agrega un producto al carrito de un usuario, la logica es que si el producto ya existe
+    en el carrito del usuario esre se incremente y acomule un monto total
+    */
 
     public CarritoResponse agregarProducto(CarritoRequest request, Long idUsuario, Long idProducto) {
         log.info("Procesando adición de producto ID {} para el usuario ID {}", idProducto, idUsuario);
@@ -68,6 +81,11 @@ public class CarritoService {
         return carritoMapper.toResponse(productoAgregado, user, prod);
     }
 
+    /*
+    Este metodo es el que se encarga de recuperar los productos que un usuario
+    tiene en su carrito
+    */
+
     public List<CarritoResponse> obtenerCarritoPorUsuario(Long idUsuario) {
         log.info("Buscando carrito del usuario ID: {}", idUsuario);
 
@@ -87,6 +105,9 @@ public class CarritoService {
                 .collect(Collectors.toList());
     }
 
+    /*
+    Este metodo actualiza de forma directa la cantidad y el monto acomulado de un item que se encuentre en el carrito
+    */
     public CarritoResponse actualizarCantidad(Long id, Integer nuevaCantidad, BigDecimal nuevoMonto) {
         log.info("Actualizando unidades del ítem de carrito ID: {}", id);
 

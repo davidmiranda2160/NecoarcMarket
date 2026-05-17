@@ -20,7 +20,7 @@ public class OrdenesMapper {
         return Ordenes.builder()
                 .usuarioId(request.getUsuarioId())
                 .total(totalCalculado)
-                .estadoOrden("pendiente")
+                .estadoOrden("PENDIENTE")
                 .fechaOrden(LocalDateTime.now())
                 .build();
     }
