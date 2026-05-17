@@ -30,10 +30,10 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
-    @GetMapping()
-    public List<Producto> buscarProductos(){
-        log.info("GET /api/productos/buscarProductos");
-        return productoService.buscarProductos();
+    @GetMapping
+    public ResponseEntity<List<ProductoResponse>> listarProductos() {
+        log.info("GET /v1/productos - Solicitando catálogo completo con stock");
+        return ResponseEntity.ok(productoService.buscarProductos());
     }
 
     @GetMapping("/{id}")
@@ -42,15 +42,12 @@ public class ProductoController {
         return productoService.buscarProductoPorId(id);
     }
 
-
     //obtener cosa por nombre
     @GetMapping("/nombrep/{nombrep}")
     public ProductoResponse buscarProductoPorNombre(@PathVariable String nombrep){
         log.info("GET /api/productos/buscarProductoPorNombre/{}", nombrep);
         return productoService.buscarProductoPorNombre(nombrep);
     }
-
-
 
     @PostMapping()
     public ResponseEntity<ProductoResponse> crearProducto(@Valid @RequestBody ProductoRequest request){
@@ -70,7 +67,4 @@ public class ProductoController {
         productoService.eliminarProducto(id);
         return ResponseEntity.noContent().build();
     }
-//Colorar un eliminar cantidades pequeñas de productos
-
-
 }

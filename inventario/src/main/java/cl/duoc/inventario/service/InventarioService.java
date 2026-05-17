@@ -32,10 +32,11 @@ public class InventarioService {
 
 
     public InventarioResponse obtenerStockPorProducto(Long productoId){
-        log.info("Consultando inventario para el producto ID: {}", productoId);
+        log.info("Consultando stock plano en base de datos para el producto ID: {}", productoId);
         Inventario inventario = inventarioRepository.findByProductoId(productoId)
-                .orElseThrow(()-> new NoSuchElementException("El producto no tiene registro en el inventario"));
-        return inventarioMapper.toResponse(inventario);     
+                .orElseThrow(() -> new NoSuchElementException("El producto no tiene registro en el inventario"));
+        
+        return inventarioMapper.toResponse(inventario);
     }
 
     public InventarioResponse agregarStock(Long productoId, Integer cantidad) {
@@ -74,4 +75,16 @@ public class InventarioService {
         ProductoResponse prod = productoClient.obtenerProductoPorId(id);
         return inventarioMapper.toDetalleDTO(inv, prod);
     }
+
+    //Metodo para eliminar de raiz el inventario por producto, toca testear
+    public void eliminarInventarioPorProducto(Long productoId) {
+        log.info("Eliminando por completo el registro de inventario para el producto ID: {}", productoId);
+    
+        Inventario inventario = inventarioRepository.findByProductoId(productoId)
+                .orElseThrow(() -> new NoSuchElementException("No se puede eliminar: el producto con ID " + productoId + " no tiene registro en inventario"));
+        
+        inventarioRepository.delete(inventario);
+    }
+
+
 }

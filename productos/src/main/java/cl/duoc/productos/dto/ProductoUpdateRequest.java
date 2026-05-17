@@ -3,7 +3,6 @@ package cl.duoc.productos.dto;
 import java.math.BigDecimal;
 
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,8 +24,7 @@ public class ProductoUpdateRequest {
     @DecimalMin(value = "0.0",inclusive = false )
     private BigDecimal precio;
 
-    @Min(value = 0)
-    private Integer stock;
+
     private String categoria;
     private Boolean activo = true;
     private Long vendedorId;

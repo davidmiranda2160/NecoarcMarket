@@ -38,9 +38,6 @@ public class Producto {
     @DecimalMin(value="0.0", inclusive = false)
     private BigDecimal precio;
 
-    @Column(nullable = false)
-    private Integer stock;
-
     @Column(length = 255)
     private String categoria;
 

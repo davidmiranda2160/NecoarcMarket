@@ -3,7 +3,6 @@ CREATE TABLE productos (
     nombrep      VARCHAR(150)    NOT NULL UNIQUE,
     descripcion  TEXT,
     precio       DECIMAL(10, 2)  NOT NULL,
-    stock        INT             NOT NULL,
     categoria    VARCHAR(255)    NULL,
     activo       BOOLEAN         NOT NULL DEFAULT TRUE,
     vendedor_id  BIGINT          NOT NULL
