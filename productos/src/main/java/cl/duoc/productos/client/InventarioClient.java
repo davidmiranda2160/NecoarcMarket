@@ -42,6 +42,6 @@ public class InventarioClient {
         }
         throw new RuntimeException("Error al consultar inventario");
     }
-}
+    }
 
 }

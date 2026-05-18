@@ -61,7 +61,7 @@ Motor de consultas optimizado. No maneja persistencia local de datos maestros pa
 
 ---
 
-## 5. Microservicio de Reseña (Puerto: 8084)
+## 5. Microservicio de Reseña (Puerto: 8086)
 Centraliza el feedback de la comunidad, permitiendo a los clientes asignar calificaciones (de 1 a 5) y comentarios escritos a los artículos adquiridos.
 
 ### Tecnologías y Dependencias
