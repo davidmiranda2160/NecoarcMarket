@@ -1,6 +1,7 @@
 package cl.duoc.usuario.exception;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -13,20 +14,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import cl.duoc.usuario.dto.ApiErrorResponse;
-@RestControllerAdvice //Esto te faltaba para lanzar las excepciones davidsiño
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RestControllerAdvice
 public class GlobalHandlerException {
     
-    @ExceptionHandler(NoSuchElementException.class)
+  @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(NoSuchElementException ex, WebRequest request) {
-        ApiErrorResponse error = ApiErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.NOT_FOUND.value())
-                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .build(); 
-        
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        log.warn("Recurso no encontrado en usuarios: {} - Detalle: {}", request.getDescription(false), ex.getMessage());
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex, WebRequest request) {
+        log.warn("Peticion invalida (IllegalArgument) en usuarios: {} - Detalle: {}", request.getDescription(false), ex.getMessage());
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -37,42 +40,27 @@ public class GlobalHandlerException {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.toList());
 
-        ApiErrorResponse error = ApiErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message("Error de validación en los datos enviados")
-                .path(request.getDescription(false).replace("uri=", ""))
-                .errors(errors) 
-                .build();
-
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex, WebRequest request) {
-        ApiErrorResponse error = ApiErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .build();
-        
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        log.warn("Error de validacion en los datos enviados a usuarios {}: {}", request.getDescription(false), errors);
+        return buildResponse(HttpStatus.BAD_REQUEST, "Error de validación en los datos enviados", request, errors);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGlobalException(Exception ex, WebRequest request) {
+        log.error("Error critica no controlado en el servicio de usuario en: {}", request.getDescription(false), ex);
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error interno en el servidor", request, null);
+    }
+
+    private ResponseEntity<ApiErrorResponse> buildResponse(HttpStatus status, String message, WebRequest request, List<String> errors) {
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .message("Ocurrió un error interno en el servidor")
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .message(message)
                 .path(request.getDescription(false).replace("uri=", ""))
+                .errors(errors != null ? errors : Collections.emptyList()) 
                 .build();
         
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, status);
     }
     
 }
