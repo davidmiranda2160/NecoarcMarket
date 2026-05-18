@@ -26,8 +26,8 @@ Este capa se encarga de gestionar la logica del negocio del carrito de compras
 es quien se encarga de las operaciones CRUD en la base de datos local y la forma 
 y la comunicacion con los microservicios de Usuario y Productos, todo es 
 transaccional lo que garantiza consistencia en los datos
-
 */
+
 @Service
 @Slf4j
 @Transactional 
@@ -97,6 +97,8 @@ public class CarritoService {
             throw new NoSuchElementException("El carrito del usuario ID " + idUsuario + " no contiene productos.");
         }
 
+        log.info("Se encontraron {} artículos en el carrito. Cargando detalles de productos...", items.size());
+
         return items.stream()
                 .map(item -> {
                     ProductoResponse prodDto = productoClient.obtenerProducto(item.getIdProducto());
@@ -106,7 +108,8 @@ public class CarritoService {
     }
 
     /*
-    Este metodo actualiza de forma directa la cantidad y el monto acomulado de un item que se encuentre en el carrito
+    Este metodo actualiza de forma directa la cantidad y el monto acomulado de un item que se encuentre 
+    en el carrito
     */
     public CarritoResponse actualizarCantidad(Long id, Integer nuevaCantidad, BigDecimal nuevoMonto) {
         log.info("Actualizando unidades del ítem de carrito ID: {}", id);
@@ -132,7 +135,7 @@ public class CarritoService {
         log.info("Eliminando ítem de carrito ID: {}", id);
 
         if (!carritoRepository.existsById(id)) {
-            log.error("Error al intentar eliminar: No existe el registro con ID: {}", id);
+            log.error("Error al intentar eliminar: no existe el registro con ID: {}", id);
             throw new NoSuchElementException("No se pudo eliminar el producto porque no existe en el carrito.");
         }
 

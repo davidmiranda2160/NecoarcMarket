@@ -1,4 +1,4 @@
-package cl.duoc.carrito.exception;
+package cl.duoc.envio.exception;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,14 +12,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import cl.duoc.carrito.dto.ApiErrorResponse;
+import cl.duoc.envio.dto.ApiErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestControllerAdvice
+@Slf4j
 public class GlobalHandlerException {
-
-    @ExceptionHandler(NoSuchElementException.class)
+     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(NoSuchElementException ex, WebRequest request) {
         log.warn("Recurso no encontrado en el endpoint: {} - Detalle: {}", request.getDescription(false), ex.getMessage());
         ApiErrorResponse error = ApiErrorResponse.builder()
