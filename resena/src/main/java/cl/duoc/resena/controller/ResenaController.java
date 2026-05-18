@@ -15,19 +15,23 @@ import cl.duoc.resena.dto.ResenaRequest;
 import cl.duoc.resena.dto.ResenaResponse;
 import cl.duoc.resena.service.ResenaService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/v1/resenas")
+@Slf4j
 public class ResenaController {
     @Autowired private ResenaService resenaService;
 
     @PostMapping
     public ResponseEntity<ResenaResponse> guardar(@Valid @RequestBody ResenaRequest request) {
+        log.info("POST /v1/resenas - Guardando reseña para el producto ID: {}", request.getProductoId());
         return new ResponseEntity<>(resenaService.crear(request), HttpStatus.CREATED);
     }
 
     @GetMapping("/producto/{productoId}")
     public ResponseEntity<List<ResenaResponse>> obtener(@PathVariable Long productoId) {
+        log.info("GET /v1/resenas/producto/{} - Obteniendo reseñas del producto", productoId);
         return ResponseEntity.ok(resenaService.listarPorProducto(productoId));
     }
 }

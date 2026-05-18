@@ -33,6 +33,7 @@ public class BusquedaController {
     
     @PostMapping("/rastrear")
     public ResponseEntity<BusquedaResponse> rastrearPedido(@Valid @RequestBody BusquedaRequest request) {
+        log.info("POST /v1/busqueda/rastrear - Solicitud de rastreo para el código: {}", request.getCodigoSeguimiento());
         BusquedaResponse respuesta = busquedaService.obtenerSeguimientoCompleto(request.getCodigoSeguimiento());
         return ResponseEntity.ok(respuesta);
     }

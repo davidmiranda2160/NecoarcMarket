@@ -1,5 +1,7 @@
 package cl.duoc.busqueda.service;
 
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,9 +28,12 @@ public class BusquedaService {
     private BusquedaMapper busquedaMapper;
 
     public BusquedaResponse obtenerSeguimientoCompleto(String codigo) {
+        log.info("Iniciando búsqueda de seguimiento para el código: {}", codigo);
         Busqueda busquedaLocal = busquedaRepository.findByCodigoSeguimiento(codigo)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
-                    "El código de seguimiento '" + codigo + "' no está registrado."));
+                .orElseThrow(() -> {
+                    log.warn("Fallo en búsqueda: El código de seguimiento '{}' no está registrado.", codigo);
+                    return new NoSuchElementException("El código de seguimiento '" + codigo + "' no está registrado.");
+                });
         String estadoFinal = busquedaLocal.getEstadoEnvio(); 
 
         try {

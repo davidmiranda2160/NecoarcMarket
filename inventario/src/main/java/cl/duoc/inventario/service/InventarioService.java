@@ -56,6 +56,8 @@ public class InventarioService {
         Inventario inventario = inventarioRepository.findByProductoId(productoId)
                 .orElseThrow(() -> new NoSuchElementException("No existe inventario para este producto"));
         if (inventario.getCantidad() < cantidadADescontar) {
+            log.warn("Fallo de stock insuficiente para el producto ID {}. Solicitado: {}, Disponible: {}", 
+                     productoId, cantidadADescontar, inventario.getCantidad());
             throw new ConflictException("Stock insuficiente. Disponible: " + inventario.getCantidad());
         }
         inventario.setCantidad(inventario.getCantidad() - cantidadADescontar);
@@ -70,8 +72,12 @@ public class InventarioService {
     }
 
     public ProductoDetalleDTO obtenerDetalleCompleto(Long id) {
+        log.info("Cruce para obtener detalle completo del producto ID: {}", id);
         Inventario inv = inventarioRepository.findByProductoId(id)
-                .orElseThrow(() -> new NoSuchElementException("El producto con id " + id + " no tiene registro en el inventario"));
+                .orElseThrow(() -> {
+                    log.warn("Fallo al obtener detalle del producto con ID {} no tiene registro en el inventario", id);
+                    return new NoSuchElementException("El producto con id " + id + " no tiene registro en el inventario");
+                });
         ProductoResponse prod = productoClient.obtenerProductoPorId(id);
         return inventarioMapper.toDetalleDTO(inv, prod);
     }
@@ -81,8 +87,10 @@ public class InventarioService {
         log.info("Eliminando por completo el registro de inventario para el producto ID: {}", productoId);
     
         Inventario inventario = inventarioRepository.findByProductoId(productoId)
-                .orElseThrow(() -> new NoSuchElementException("No se puede eliminar: el producto con ID " + productoId + " no tiene registro en inventario"));
-        
+                .orElseThrow(() -> {
+                    log.warn("Intento de eliminación fallido, l producto con ID {} no tiene registro en inventario", productoId);
+                    return new NoSuchElementException("No se puede eliminar: el producto con ID " + productoId + " no tiene registro en inventario");
+                });        
         inventarioRepository.delete(inventario);
     }
 

@@ -105,6 +105,7 @@ public class ProductoService {
     public ProductoResponse crearProducto(ProductoRequest request){
         log.info("Creando producto con nombre: {}", request.getNombrep());
         if(productoRepository.existsByNombrep(request.getNombrep())){
+            log.warn("El nombre del producto '{}' ya existe", request.getNombrep());
             throw new ConflictException("El nombre del producto ya existe");
         }        
         
@@ -133,8 +134,9 @@ public class ProductoService {
                 .orElseThrow(() -> new NoSuchElementException("Producto no encontrado"));
 
         if (request.getNombrep() != null && productoRepository.existsByNombrepAndIdNot(request.getNombrep(), id)) {
+            log.warn("Fallo en el nombre del producto '{}' ya existe", request.getNombrep());
             throw new ConflictException("Ya existe otro producto con ese nombre");
-        }        
+        }        //Quité el stock porque forma parte de inventario
         if (request.getNombrep() != null) producto.setNombrep(request.getNombrep());
         if (request.getDescripcion() != null) producto.setDescripcion(request.getDescripcion());
         if (request.getPrecio() != null) producto.setPrecio(request.getPrecio());
@@ -150,6 +152,7 @@ public class ProductoService {
                 stockActual = inventario.getCantidad();
             }
         } catch (Exception e) {
+            log.error("Inventario caído al actualizar ID {}, se asigna stock 0", id);
             stockActual = 0;
         }
         return productoMapper.toResponse(producto, stockActual);
@@ -159,6 +162,7 @@ public class ProductoService {
     public void eliminarProducto(Long id) {
         log.info("Eliminando producto con ID: {}", id);
         if (!productoRepository.existsById(id)) {
+            log.warn("Falló la eliminación, producto con ID {} no encontrado", id);
             throw new NoSuchElementException("Producto no encontrado");
         }
         productoRepository.deleteById(id);

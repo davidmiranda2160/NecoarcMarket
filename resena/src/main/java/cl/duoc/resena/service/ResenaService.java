@@ -29,27 +29,25 @@ public class ResenaService {
     private UsuarioClient usuarioClient;
 
     public ResenaResponse crear(ResenaRequest request) {
+        log.info("Inicio de creación de reseña para el producto ID {}", request.getProductoId());
         Resena resena = resenaMapper.fromRequest(request);
         Resena guardada = resenaRepository.save(resena);
-
-
-        String nombreParaMostrar = obtenerNombreDeDavid(guardada.getUsuarioId());
-
-
-        return resenaMapper.toResponse(guardada, nombreParaMostrar);
+        String nombreParaMostrar = obtenerNombreDeUsuario(guardada.getUsuarioId());
+            return resenaMapper.toResponse(guardada, nombreParaMostrar);
     }
 
     public List<ResenaResponse> listarPorProducto(Long productoId) {
+        log.info("Buscando todas las reseñas asociadas al producto ID: {}", productoId);
         return resenaRepository.findByProductoId(productoId).stream()
                 .map(resena -> {
-                    String nombre = obtenerNombreDeDavid(resena.getUsuarioId());
+                    String nombre = obtenerNombreDeUsuario(resena.getUsuarioId());
                     return resenaMapper.toResponse(resena, nombre);
                 })
                 .collect(Collectors.toList());
     }
 
     //Tanto problema y solo era el null de la fecha
-    private String obtenerNombreDeDavid(Long usuarioId) {
+    private String obtenerNombreDeUsuario(Long usuarioId) {
         try {
             UsuarioResponse user = usuarioClient.obtenerDatosUsuario(usuarioId);
             if (user == null || user.getNombre() == null) {
@@ -58,7 +56,7 @@ public class ResenaService {
             }
             return user.getNombre() + " " + (user.getApellidos() != null ? user.getApellidos() : "");
         } catch (Exception e) {
-            log.error("Error crítico al intentar obtener nombre de David: {}", e.getMessage());
+            log.error("Error al intentar obtener el nombre usuario (vamos a dejar vivo a David): {}", e.getMessage());
             return "Servicio no disponible";
         }
     }
