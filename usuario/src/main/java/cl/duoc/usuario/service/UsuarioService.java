@@ -32,34 +32,43 @@ public class UsuarioService {
     private UsuarioMapper usuarioMapper;
 
     public List<Usuario> listarUsuarios() {
-        log.info("Buscando todos los usuarios");
-        return usuarioRespository.findAll();
+        log.info("Solicitando el listado completo de todos los usuarios registrados");
+        List<Usuario> usuarios = usuarioRespository.findAll();
+        log.info("Se recuperaron {} usuarios con éxito de la base de datos", usuarios.size());
+        return usuarios;
     }
 
     public UsuarioResponse crearUsuario(UsuarioRequest request) {
-        log.info("Intentando crear al usuario con correo: {}", request.getCorreo());
+        log.info("Intentando registrar un nuevo usuario con correo: {}", request.getCorreo());
 
         Usuario usuario = usuarioMapper.fromRequest(request);
         Usuario usuarioGuardado = usuarioRespository.save(usuario);
 
-        log.info("Usuario creado exitosamente");
+        log.info("Usuario creado correctamente con el id: {}", usuarioGuardado.getId());
         return usuarioMapper.toResponse(usuarioGuardado);
     }
 
     public UsuarioResponse obtenerUsuarioPorId(Long id) {
-        log.info("Buscando usuario con ID: {}", id);
+        log.info("Buscando informacion del usuario con el id: {}", id);
 
         Usuario usuario = usuarioRespository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No se encontró el usuario con id: " + id));
+                .orElseThrow(() -> {
+                    log.warn("La consulta fallo: El usuario con el id {} no existe en el sistema", id);
+                    return new NoSuchElementException("No se encontro el usuario con id: " + id);
+                });
 
+        log.info("Usuario con el id {} fue localizado", id);
         return usuarioMapper.toResponse(usuario);
     }
 
     public UsuarioResponse actualizarUsuario(Long id, UsuarioRequest datosNuevos) {
-        log.info("Buscando usuario con ID: {} para actualizar", id);
+        log.info("Buscando usuario con el id: {} para iniciar la actualizacion de datos", id);
 
         Usuario usuarioExistente = usuarioRespository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No existe el usuario " + id + " a actualizar"));
+                .orElseThrow(() -> {
+                    log.warn("La actualizacion fallo: El usuario con el id {} no se puede actualizar porque no existe", id);
+                    return new NoSuchElementException("No existe el usuario " + id + " a actualizar");
+                });
 
         if (datosNuevos.getNombre() != null) {
             usuarioExistente.setNombre(datosNuevos.getNombre());
@@ -81,31 +90,44 @@ public class UsuarioService {
         }
 
         Usuario usuarioActualizado = usuarioRespository.save(usuarioExistente);
-        log.info("Usuario ID {} actualizado correctamente", id);
+        log.info("Los datos del usuario con el id {} fueron actualizados correctamente en la base de datos", id);
 
         return usuarioMapper.toResponse(usuarioActualizado);
     }
 
     public void eliminarUsuarioPorId(Long id) {
-        log.info("Intentando eliminar usuario con ID: {}", id);
+        log.info("Intentando eliminar de la base de datos al usuario con id: {}", id);
 
         if (!usuarioRespository.existsById(id)) {
+            log.warn("La eliminacion fallo: No se pudo encontrar al usuario con id: {} para realizar el borrado", id);
             throw new NoSuchElementException("No se pudo encontrar al usuario con id: " + id + " para eliminar");
         }
 
         usuarioRespository.deleteById(id);
-        log.info("Usuario eliminado correctamente");
+        log.info("Usuario con el id {} eliminado correctamente del sistema", id);
     }
 
     public PagosResponse solicitarPago(Long usuarioId, PagosRequest request) {
-        usuarioRespository.findById(usuarioId)
-                .orElseThrow(() -> new NoSuchElementException("No existe el usuario con ID: " + usuarioId));
+        log.info("Usuario con el id {} solicita procesar un pago externo de monto: ${}", usuarioId, request.getMontoAPagar());
 
-        return pagosClient.crearPago(request);
+        usuarioRespository.findById(usuarioId)
+                .orElseThrow(() -> {
+                    log.warn("Solicitud de pago abortada: El usuario solicitante con id {} no existe", usuarioId);
+                    return new NoSuchElementException("No existe el usuario con el id: " + usuarioId);
+                });
+
+        log.info("Comunicandose con el microservicio externo de pagos para la orden con id: {}", request.getIdOrden());
+        PagosResponse response = pagosClient.crearPago(request);
+        log.info("El microservicio de pagos respondio correctamente para el usuario con id: {}", usuarioId);
+
+        return response;
     }
 
     public List<PagosResponse> obtenerHistorialPagos() {
-        return pagosClient.listarPagos();
+        log.info("Solicitando el historial general de transacciones al microservicio de Pagos");
+        List<PagosResponse> historial = pagosClient.listarPagos();
+        log.info("Historial de pagos obtenido. Registros devueltos: {}", historial.size());
+        return historial;
     }
 
 }

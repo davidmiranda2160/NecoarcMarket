@@ -43,16 +43,18 @@ public class OrdenesService {
         List<CarritoResponse> carrito = carritoClient.obtenerCarritoPorUsuario(request.getUsuarioId());
 
         if (carrito == null || carrito.isEmpty()) {
+            log.warn("Intento de creacion de orden fallido: El carrito del usuario con id {} está vacio", request.getUsuarioId());
             throw new NoSuchElementException("No hay productos en el carrito para generar una orden.");
         }
 
         BigDecimal totalCalculado = carrito.stream()
                 .map(CarritoResponse::getMontoTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        log.info("Carrito recuperado con {} productos y monto total calculado: ${}", carrito.size(), totalCalculado);
                 
         Ordenes orden = ordenesMapper.fromRequest(request, totalCalculado); 
         Ordenes ordenGuardada = ordenesRepository.save(orden);
-        log.info("Orden guardada localmente con ID: {}", ordenGuardada.getId());
+        log.info("Orden guardada localmente con id: {}", ordenGuardada.getId());
 
         PagosRequest pagoReq = PagosRequest.builder()
                 .idOrden(ordenGuardada.getId())
@@ -60,11 +62,15 @@ public class OrdenesService {
                 .montoAPagar(totalCalculado)
                 .build();
         
+        log.info("Enviando solicitud de pago al microservicio externo para la orden ID: {}", ordenGuardada.getId());
         pagosClient.procesarPago(pagoReq); 
+        log.info("Pago procesado exitosamente para la orden con id: {}", ordenGuardada.getId());
 
         List<CarritoResponse> detalleParaRespuesta = new ArrayList<>(carrito); 
 
+        log.info("Se esta solicitando limpieza de carrito para el usuario con id: {}", request.getUsuarioId());
         carritoClient.limpiarCarrito(request.getUsuarioId());
+        log.info("Ls orden con id {} fue completada con éxito", ordenGuardada.getId());
 
         return ordenesMapper.toResponse(ordenGuardada, detalleParaRespuesta);
     }
@@ -87,30 +93,36 @@ public class OrdenesService {
     }
 
     public List<OrdenesResponse> obtenerPorEstado(String estado) {
-        log.info("Buscando órdenes por estado: {}", estado);
-        return ordenesRepository.findByEstadoOrden(estado).stream()
+        log.info("Buscando ordenes por estado: {}", estado);
+        List<Ordenes> ordenes = ordenesRepository.findByEstadoOrden(estado);
+        
+        log.info("Se encontraron {} ordenes bajo el estado '{}'", ordenes.size(), estado);
+        return ordenes.stream()
                 .map(orden -> ordenesMapper.toResponse(orden, null))
                 .collect(Collectors.toList());
     }
 
     public List<OrdenesResponse> obtenerTodas() {
-        log.info("Buscando todas las órdenes del sistema");
-        return ordenesRepository.findAll().stream()
+        log.info("Buscando todas las ordenes del sistema");
+        List<Ordenes> ordenes = ordenesRepository.findAll();
+        
+        log.info("Todas las ordenes fueron recuperadas de la base de datos: {}", ordenes.size());
+        return ordenes.stream()
                 .map(orden -> ordenesMapper.toResponse(orden, null))
                 .collect(Collectors.toList());
     }
 
     public OrdenesResponse obtenerPorId(Long id) {
-        log.info("Buscando orden por ID: {}", id);
-        Ordenes orden = ordenesRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Orden no encontrada con ID: " + id));
+        log.info("Buscando orden por el id: {}", id);
         
-        List<CarritoResponse> items = null;
-        try {
-            items = carritoClient.obtenerCarritoPorUsuario(orden.getUsuarioId());
-        } catch (Exception e) {
-            log.error("No se pudo obtener el detalle del carrito para la orden {}", id);
-        }
+        Ordenes orden = ordenesRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("La consulta fallo: La orden con el id {} no existe", id);
+                    return new NoSuchElementException("Orden no encontrada con ID: " + id);
+                });
+        
+        log.info("Orden con id {} encontrada. Consultando articulos en el carrito del usuario con id: {}", id, orden.getUsuarioId());
+        List<CarritoResponse> items = carritoClient.obtenerCarritoPorUsuario(orden.getUsuarioId());
 
         return ordenesMapper.toResponse(orden, items);
     }
