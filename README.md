@@ -45,7 +45,7 @@ Actúa como el control de bodega física centralizado del ecosistema. Su única 
 
 ### Conexiones e Integración
 - **Aislamiento de stock**: Expone endpoints clave como `PUT /v1/inventario/producto/{id}/descontar`.
-- **Consumo centralizado**: Es invocado síncronamente por dos frentes: por `ms-productos` (Puerto 8081) para calcular la disponibilidad de la vitrina, y por `ms-ordenes` (Puerto 8088) para restar existencias de forma inmediata al confirmarse una compra.
+- **Consumo centralizado**: Es invocado síncronamente por dos frentes: por `ms-productos` (Puerto 8081) para calcular la disponibilidad de la vitrina.
 
 ---
 
@@ -81,11 +81,11 @@ Centralizador de comunicaciones encargado de simular de manera reactiva el enví
 - **Logger Unificado (`@Slf4j`)**
 
 ### Conexiones e Integración
-- **Suscripción de eventos**: Funciona como un receptor puro de eventos de red. Cuando `ms-ordenes` (Puerto 8088) emite una boleta con éxito o `ms-pagos` (Puerto 8092) aprueba una transacción, le notifican a este servicio por HTTP. El sistema procesa la información y genera logs formateados en consola que simulan el despacho inmediato de correos de confirmación.
+- **Notificacion-usuario**: funciona haciendo conexion con usuario con `ms-usuario` indicando notificaciones de ofertas o ventas.
 
 ---
 
-## 7. Microservicio de Envío (Puerto: 8086)
+## 7. Microservicio de Envío (Puerto: 8084)
 Módulo logístico encargado de la gestión de despachos, asignación de direcciones de entrega y seguimiento de los estados de envío de los paquetes.
 
 ### Tecnologías y Dependencias
@@ -119,7 +119,7 @@ El núcleo transaccional del sistema. Consolida los carritos de compra activos, 
 
 ### Conexiones e Integración
 - **Flujo de Consolidación**: Al generar una orden, se comunica mediante `WebClient` con `ms-carrito` (Puerto 8087) para extraer recursivamente los ítems agregados por el `usuarioId`. 
-- **Ciclo de Cierre**: Una vez guardada la orden con éxito, emite peticiones síncronas de eliminación (`DELETE`) a `ms-carrito` para limpiar el espacio de compra temporal del usuario y gatilla la alerta a `ms-notificacion` (Puerto 8085).
+- 
 
 ---
 
@@ -132,7 +132,7 @@ Entidad financiera interna del Marketplace encargada de validar montos, procesar
 - **WebClient (`.block()`)**
 
 ### Conexiones e Integración
-- **Validación del Negocio**: Al ejecutarse el método `procesarPago(@Valid PagosRequest request)`, el servicio utiliza un `WebClient` preconfigurado con la propiedad `services.ordenes.baseUrl` para ir a golpear a `ms-ordenes` (Puerto 8088) y corroborar que el ID de la orden exista y el monto coincida exactamente con la boleta antes de aprobar la transacción.
+- **Validación de Flujos**: El microservicio no orquesta compras por sí mismo. Se activa e interactúa directamente dentro del flujo del microservicio de Usuarios (ms-usuario, Puerto 8080) al momento en que este procesa un pago, encargándose exclusivamente de autorizar los montos y registrar la transacción financiera.
 
 ---
 
@@ -151,9 +151,9 @@ Entidad financiera interna del Marketplace encargada de validar montos, procesar
 | `ms-productos` | **8081** | `db_necoarcmarket_productos` | `ms-inventario` (8082) |
 | `ms-inventario` | **8082** | `db_necoarcmarket_inventario` | `ms-producto` (8081) |
 | `ms-busqueda` | **8083** | `db_necoarcmarket_busqueda` | `ms-productos` (8081) y `ms-inventario` (8082) |
-| `ms-resena` | **8084** | `db_necoarcmarket_resenas` | `ms-productos` (8081) |
+| `ms-resena` | **8086** | `db_necoarcmarket_resenas` | `ms-productos` (8081) |
 | `ms-notificacion`| **8085** | `db_necoarcmarket_notificacion` | `ms-usuario` (8080) |
-| `ms-envio` | **8086** | `db_necoarcmarket_envio` | `ms-ordenes` (8088) |
+| `ms-envio` | **8084** | `db_necoarcmarket_envio` | `ms-ordenes` (8088) |
 | `ms-carrito` | **8087** | `db_necoarcmarket_carrito` | `ms-usuario` (8080) y `ms-productos` (8081) |
 | `ms-ordenes` | **8088** | `db_necoarcmarket_ordenes` | `ms-carrito` (8087) y `ms-notificacion` (8085) |
 | `ms-pagos` | **8092** | `db_neroarcmarket_pagos` | `ms-ordenes` (8088) |
