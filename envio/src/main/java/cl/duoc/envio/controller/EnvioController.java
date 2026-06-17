@@ -2,58 +2,52 @@ package cl.duoc.envio.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam; 
 import org.springframework.web.bind.annotation.RestController;
 
 import cl.duoc.envio.dto.EnvioRequest;
 import cl.duoc.envio.dto.EnvioResponse;
 import cl.duoc.envio.service.EnvioService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("v1/envio")
+@RequiredArgsConstructor
 public class EnvioController {
 
-    @Autowired
-    private EnvioService envioService;
+    private final EnvioService envioService;
 
-    // Creamos un envío asociado a una orden
-    @PostMapping("/orden/{ordenId}")
-    public ResponseEntity<EnvioResponse> crearEnvio(
-            @Valid @RequestBody EnvioRequest request, 
-            @PathVariable Long ordenId) {
-        
-        EnvioResponse response = envioService.crearEnvio(request, ordenId);
-        
-        if (response != null) {
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        }
-        
-        return ResponseEntity.badRequest().build();
+    @PostMapping
+    public ResponseEntity<EnvioResponse> crearEnvio(@Valid @RequestBody EnvioRequest request) {
+        EnvioResponse response = envioService.crearEnvio(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    //Lista todos los envíos
     @GetMapping
     public ResponseEntity<List<EnvioResponse>> listarTodos() {
         return ResponseEntity.ok(envioService.listarTodos());
     }
 
-    // Obtenemos un envío por medio de su id
     @GetMapping("/{id}")
     public ResponseEntity<EnvioResponse> obtenerPorId(@PathVariable Long id) {
         EnvioResponse response = envioService.obtenerPorId(id);
-        
-        if (response != null) {
-            return ResponseEntity.ok(response);
-        }
-        
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/estado")
+    public ResponseEntity<EnvioResponse> actualizarEstado(
+            @PathVariable Long id, 
+            @RequestParam String nuevoEstado) {
+        EnvioResponse response = envioService.actualizarEstado(id, nuevoEstado);
+        return ResponseEntity.ok(response);
     }
 }

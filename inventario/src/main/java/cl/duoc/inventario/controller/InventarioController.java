@@ -1,6 +1,5 @@
 package cl.duoc.inventario.controller;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,30 +27,30 @@ public class InventarioController {
     private InventarioService inventarioService;
 
     @PostMapping("/abastecer")
-    public ResponseEntity<InventarioResponse> abastecer(@Valid @RequestBody InventarioRequest request){
+    public ResponseEntity<InventarioResponse> abastecer(@Valid @RequestBody InventarioRequest request) {
         return ResponseEntity.ok(inventarioService.agregarStock(request.getProductoId(), request.getCantidad()));
 
     }
 
-    //para descontar cantidad de productos en el inventario
+    // para descontar cantidad de productos en el inventario
     @PutMapping("/producto/{productoId}/descontar")
     public ResponseEntity<InventarioResponse> descontarStock(
-            @PathVariable Long productoId, 
+            @PathVariable Long productoId,
             @RequestParam Integer cantidad) {
         log.info("PUT /v1/inventario/producto/{}/descontar?cantidad={}", productoId, cantidad);
         InventarioResponse response = inventarioService.descontarStock(productoId, cantidad);
         return ResponseEntity.ok(response);
     }
-    
+
     @GetMapping("/producto/{id}")
-    public ResponseEntity<InventarioResponse> obtenerStockPlano(@PathVariable Long id){
+    public ResponseEntity<InventarioResponse> obtenerStockPlano(@PathVariable Long id) {
         log.info("GET /v1/inventario/producto/{} - Solicitud de stock plano para Productos", id);
         InventarioResponse response = inventarioService.obtenerStockPorProducto(id);
         return ResponseEntity.ok(response);
     }
-    
+
     @GetMapping("/producto/{id}/detalle")
-    public ResponseEntity<ProductoDetalleDTO> obtenerDetalleCompleto(@PathVariable Long id){
+    public ResponseEntity<ProductoDetalleDTO> obtenerDetalleCompleto(@PathVariable Long id) {
         log.info("GET /v1/inventario/producto/{}/detalle - Solicitud de información cruzada", id);
         ProductoDetalleDTO detalle = inventarioService.obtenerDetalleCompleto(id);
         return ResponseEntity.ok(detalle);
@@ -61,6 +60,15 @@ public class InventarioController {
     public ResponseEntity<Void> eliminarInventario(@PathVariable Long productoId) {
         log.info("DELETE /v1/inventario/producto/{}", productoId);
         inventarioService.eliminarInventarioPorProducto(productoId);
-        return ResponseEntity.noContent().build(); 
+        return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/producto/{productoId}/stock")
+    public ResponseEntity<Boolean> tieneStock(
+            @PathVariable Long productoId,
+            @RequestParam Integer cantidad) {
+        return ResponseEntity.ok(
+                inventarioService.tieneStockSuficiente(productoId, cantidad));
+    }
+
 }

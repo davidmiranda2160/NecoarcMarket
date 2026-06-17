@@ -1,6 +1,5 @@
 package cl.duoc.pagos.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,11 +11,6 @@ public interface PagosRepository extends JpaRepository<Pagos, Long> {
        especifico
     */
     Optional<Pagos> findByIdOrden(Long id);
-
-    /*
-    El siguente metodo es para listar los pedidos segun su estado
-    */
-    List<Pagos> findByEstadoPago(String pago);
 
     /*
     Con este metodo verificamos si un pedido ya fue procesado

@@ -2,7 +2,6 @@ package cl.duoc.carrito.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,15 +17,16 @@ import cl.duoc.carrito.dto.CarritoRequest;
 import cl.duoc.carrito.dto.CarritoResponse;
 import cl.duoc.carrito.service.CarritoService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/v1/carrito")
 @Slf4j
+@RequiredArgsConstructor
 public class CarritoController {
 
-    @Autowired
-    private CarritoService carritoService;
+    private final CarritoService carritoService;
 
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<List<CarritoResponse>> obtenerCarritoPorUsuario(@PathVariable Long idUsuario) {
@@ -50,7 +50,7 @@ public class CarritoController {
             @Valid @RequestBody CarritoRequest request) {
         log.info("PUT /v1/carrito/{} - Actualizando cantidades", id);
 
-        CarritoResponse response = carritoService.actualizarCantidad(id, request.getCantidad(), request.getMontoTotal());
+        CarritoResponse response = carritoService.actualizarCantidad(id, request.getCantidad());
         return ResponseEntity.ok(response);
     }
 

@@ -1,6 +1,7 @@
 package cl.duoc.envio.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name= "Envios")
+@Table(name= "envios")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,22 +25,28 @@ public class Envio {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "orden_id", nullable = false)
     private Long ordenId;
 
-    @Column(nullable= false)
+    @Column(name = "usuario_id", nullable = false)
+    private Long usuarioId;
+    
+    @Column(name = "direccion_destino", nullable= false)
     private String direccionDestino;
 
-    @Column(nullable= false)
+    @Column(name = "numero_seguimiento", nullable= false)
     private String numeroSeguimiento;
 
-    @Column(nullable= false)
+    @Column(name= "estado_envio", nullable= false)
     private String estadoEnvio;
 
-    @Column(nullable= false)
+    @Column(name = "empresa_transporte",nullable= false)
     private String empresaTransporte;
 
-    @Column(nullable= false)
+    @Column(name = "fecha_estimada_entrega", nullable= false)
     private LocalDate fechaEstimadaEntrega;
+
+    @Column(name = "fecha_creacion", nullable= false)
+    private LocalDateTime fechaCreacion;
 
 }

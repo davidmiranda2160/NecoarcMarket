@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cl.duoc.usuario.dto.PagosRequest;
-import cl.duoc.usuario.dto.PagosResponse;
 import cl.duoc.usuario.dto.UsuarioRequest;
 import cl.duoc.usuario.dto.UsuarioResponse;
 import cl.duoc.usuario.model.Usuario;
@@ -68,15 +66,4 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarios);
     }
 
-    @PostMapping("/{id}/pagar")
-    public ResponseEntity<PagosResponse> pagar(@PathVariable Long id, @RequestBody PagosRequest request) {
-        log.info("POST /v1/usuario/{}/pagos - Solicitando pago al microservicio", id);
-        return ResponseEntity.ok(usuarioService.solicitarPago(id, request));
-    }
-
-    @GetMapping("/reporte-pagos")
-    public ResponseEntity<List<PagosResponse>> verTodosLosPagos() {
-        log.info("GET /v1/usuario/pagos-reporte - Obteniendo historial global");
-        return ResponseEntity.ok(usuarioService.obtenerHistorialPagos());
-    }
 }

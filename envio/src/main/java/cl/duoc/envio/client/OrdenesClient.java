@@ -1,6 +1,6 @@
 package cl.duoc.envio.client;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -11,13 +11,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrdenesClient {
 
-    @Autowired
-    private WebClient webClient;
+    
+    private final WebClient webClient;
+
+
+    public OrdenesClient(WebClient.Builder webClientBuilder,
+            @Value("${services.ordenes.baseUrl}") String baseUrl) {
+        this.webClient = webClientBuilder.baseUrl(baseUrl).build();
+    }
 
     public OrdenesResponse buscarOrdenPorId(Long id) {
         try {
             return webClient.get()
-                    .uri("/ordenes/{id}", id)
+                    .uri("v1/ordenes/{id}", id)
                     .retrieve()
                     .bodyToMono(OrdenesResponse.class)
                     .block();

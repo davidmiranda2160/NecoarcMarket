@@ -17,7 +17,4 @@ private Long id;
     private String descripcion;
     private BigDecimal precio;
     private Integer stock;
-    private String categoria;
-    private Boolean activo = true;
-    private Long vendedorId;
 }

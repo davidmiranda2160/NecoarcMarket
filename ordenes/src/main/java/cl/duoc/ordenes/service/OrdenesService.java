@@ -1,129 +1,137 @@
 package cl.duoc.ordenes.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cl.duoc.ordenes.client.CarritoClient;
-import cl.duoc.ordenes.client.PagosClient;
+import cl.duoc.ordenes.client.InventarioClient;
 import cl.duoc.ordenes.dto.CarritoResponse;
 import cl.duoc.ordenes.dto.OrdenesRequest;
 import cl.duoc.ordenes.dto.OrdenesResponse;
-import cl.duoc.ordenes.dto.PagosRequest;
 import cl.duoc.ordenes.mapper.OrdenesMapper;
 import cl.duoc.ordenes.model.Ordenes;
+import cl.duoc.ordenes.model.OrdenesDetalle;
+import cl.duoc.ordenes.repository.OrdenesDetalleRepository;
 import cl.duoc.ordenes.repository.OrdenesRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Transactional
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class OrdenesService {
-    @Autowired
-    private OrdenesRepository ordenesRepository;
 
-    @Autowired
-    private OrdenesMapper ordenesMapper;
+    private final OrdenesRepository ordenesRepository;
 
-    @Autowired
-    private CarritoClient carritoClient;
+    private final OrdenesDetalleRepository ordenesDetalleRepository;
 
-    @Autowired
-    private PagosClient pagosClient;
+    private final OrdenesMapper ordenesMapper;
+
+    private final CarritoClient carritoClient;
+
+    private final InventarioClient inventarioClient;
 
     public OrdenesResponse crearOrden(OrdenesRequest request) {
-        log.info("Iniciando creación de orden para usuario ID: {}", request.getUsuarioId());
+        log.info("Iniciando creación de orden descentralizada para usuario ID: {}", request.getUsuarioId());
 
         List<CarritoResponse> carrito = carritoClient.obtenerCarritoPorUsuario(request.getUsuarioId());
-
         if (carrito == null || carrito.isEmpty()) {
-            log.warn("Intento de creacion de orden fallido: El carrito del usuario con id {} está vacio", request.getUsuarioId());
             throw new NoSuchElementException("No hay productos en el carrito para generar una orden.");
         }
 
         BigDecimal totalCalculado = carrito.stream()
                 .map(CarritoResponse::getMontoTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        log.info("Carrito recuperado con {} productos y monto total calculado: ${}", carrito.size(), totalCalculado);
-                
-        Ordenes orden = ordenesMapper.fromRequest(request, totalCalculado); 
+
+        log.info("Verificando stock y comprometiendo existencias en inventario...");
+        for (CarritoResponse item : carrito) {
+            inventarioClient.descontarStock(item.getProducto().getId(), item.getCantidad());
+        }
+
+        Ordenes orden = ordenesMapper.fromRequest(request, totalCalculado);
         Ordenes ordenGuardada = ordenesRepository.save(orden);
-        log.info("Orden guardada localmente con id: {}", ordenGuardada.getId());
+        log.info("Orden de cabecera guardada exitosamente con ID: {}", ordenGuardada.getId());
 
-        PagosRequest pagoReq = PagosRequest.builder()
-                .idOrden(ordenGuardada.getId())
-                .metodoPago(request.getMetodoPago())
-                .montoAPagar(totalCalculado)
-                .build();
-        
-        log.info("Enviando solicitud de pago al microservicio externo para la orden ID: {}", ordenGuardada.getId());
-        pagosClient.procesarPago(pagoReq); 
-        log.info("Pago procesado exitosamente para la orden con id: {}", ordenGuardada.getId());
+        log.info("Generando instantánea histórica de detalles para la orden ID: {}", ordenGuardada.getId());
+        List<OrdenesDetalle> detalles = carrito.stream()
+                .map(item -> ordenesMapper.toDetalleEntity(item, ordenGuardada.getId()))
+                .collect(Collectors.toList());
 
-        List<CarritoResponse> detalleParaRespuesta = new ArrayList<>(carrito); 
+        List<OrdenesDetalle> detallesGuardados = ordenesDetalleRepository.saveAll(detalles);
+        log.info("Se registrararon {} líneas de detalle en la base de datos.", detallesGuardados.size());
 
-        log.info("Se esta solicitando limpieza de carrito para el usuario con id: {}", request.getUsuarioId());
+        log.info("Vaciando el carrito del usuario ID: {} tras conversión exitosa.", request.getUsuarioId());
         carritoClient.limpiarCarrito(request.getUsuarioId());
-        log.info("Ls orden con id {} fue completada con éxito", ordenGuardada.getId());
 
-        return ordenesMapper.toResponse(ordenGuardada, detalleParaRespuesta);
+        return ordenesMapper.toResponse(ordenGuardada, detallesGuardados);
+    }
+
+    public OrdenesResponse obtenerPorId(Long id) {
+        log.info("Consultando historial estático para la orden ID: {}", id);
+        Ordenes orden = ordenesRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Orden no encontrada con ID: " + id));
+
+        List<OrdenesDetalle> detalles = ordenesDetalleRepository.findByOrdenId(orden.getId());
+
+        return ordenesMapper.toResponse(orden, detalles);
     }
 
     public List<OrdenesResponse> obtenerPorUsuario(Long usuarioId) {
-        log.info("Buscando historial para el usuario: {}", usuarioId);
-        
-        List<CarritoResponse> items = null;
-        try {
-            items = carritoClient.obtenerCarritoPorUsuario(usuarioId);
-        } catch (Exception e) {
-            log.error("No se pudo obtener el carrito para el historial del usuario {}", usuarioId);
-        }
-
-        List<CarritoResponse> finalItems = items; 
-        
+        log.info("Buscando lista de órdenes del usuario: {}", usuarioId);
         return ordenesRepository.findByUsuarioId(usuarioId).stream()
-                .map(orden -> ordenesMapper.toResponse(orden, finalItems))
+                .map(orden -> {
+                    List<OrdenesDetalle> detalles = ordenesDetalleRepository.findByOrdenId(orden.getId());
+                    return ordenesMapper.toResponse(orden, detalles);
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<OrdenesResponse> obtenerTodas() {
+        log.info("Recuperando el catálogo completo de órdenes del sistema");
+        return ordenesRepository.findAll().stream()
+                .map(orden -> {
+                    List<OrdenesDetalle> detalles = ordenesDetalleRepository.findByOrdenId(orden.getId());
+                    return ordenesMapper.toResponse(orden, detalles);
+                })
                 .collect(Collectors.toList());
     }
 
     public List<OrdenesResponse> obtenerPorEstado(String estado) {
         log.info("Buscando ordenes por estado: {}", estado);
-        List<Ordenes> ordenes = ordenesRepository.findByEstadoOrden(estado);
-        
-        log.info("Se encontraron {} ordenes bajo el estado '{}'", ordenes.size(), estado);
-        return ordenes.stream()
-                .map(orden -> ordenesMapper.toResponse(orden, null))
+        return ordenesRepository.findByEstadoOrden(estado).stream()
+                .map(orden -> {
+                    List<OrdenesDetalle> detalles = ordenesDetalleRepository.findByOrdenId(orden.getId());
+                    return ordenesMapper.toResponse(orden, detalles);
+                })
                 .collect(Collectors.toList());
     }
 
-    public List<OrdenesResponse> obtenerTodas() {
-        log.info("Buscando todas las ordenes del sistema");
-        List<Ordenes> ordenes = ordenesRepository.findAll();
-        
-        log.info("Todas las ordenes fueron recuperadas de la base de datos: {}", ordenes.size());
-        return ordenes.stream()
-                .map(orden -> ordenesMapper.toResponse(orden, null))
-                .collect(Collectors.toList());
-    }
+    public void actualizarEstadoDesdePagos(Long idOrden, String nuevoEstado) {
+        log.info("Cambiando estado de orden ID {} a: {}", idOrden, nuevoEstado);
 
-    public OrdenesResponse obtenerPorId(Long id) {
-        log.info("Buscando orden por el id: {}", id);
-        
-        Ordenes orden = ordenesRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("La consulta fallo: La orden con el id {} no existe", id);
-                    return new NoSuchElementException("Orden no encontrada con ID: " + id);
-                });
-        
-        log.info("Orden con id {} encontrada. Consultando articulos en el carrito del usuario con id: {}", id, orden.getUsuarioId());
-        List<CarritoResponse> items = carritoClient.obtenerCarritoPorUsuario(orden.getUsuarioId());
+        Ordenes orden = ordenesRepository.findById(idOrden)
+                .orElseThrow(() -> new NoSuchElementException("No existe la orden con ID: " + idOrden));
 
-        return ordenesMapper.toResponse(orden, items);
+        if ("Cancelada".equalsIgnoreCase(nuevoEstado)) {
+            log.warn("La orden ID {} fue rechazada en pagos. Iniciando proceso de devolución de stock...", idOrden);
+
+            List<OrdenesDetalle> detalles = ordenesDetalleRepository.findByOrdenId(idOrden);
+
+            for (OrdenesDetalle detalle : detalles) {
+                log.info("Reintegrando stock: Producto ID {}, Cantidad {}", detalle.getIdProducto(), detalle.getCantidad());
+        
+                inventarioClient.reintegrarStock(detalle.getIdProducto(), detalle.getCantidad());
+            }
+        }
+
+        orden.setEstadoOrden(nuevoEstado);
+        ordenesRepository.save(orden);
+        log.info("Estado de la orden ID {} actualizado exitosamente en base de datos.", idOrden);
     }
 }

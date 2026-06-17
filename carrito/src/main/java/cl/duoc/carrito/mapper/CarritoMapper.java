@@ -15,7 +15,6 @@ public class CarritoMapper {
                 .idUsuario(idUsuario)  
                 .idProducto(idProducto) 
                 .cantidad(request.getCantidad())
-                .montoTotal(request.getMontoTotal())
                 .build();
        }
 

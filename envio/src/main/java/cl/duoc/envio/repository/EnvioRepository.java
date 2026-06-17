@@ -18,4 +18,6 @@ public interface EnvioRepository extends JpaRepository<Envio, Long> {
     List<Envio> findByEstadoEnvio(String estadoEnvio);
 
     List<Envio> findByEmpresaTransporte(String empresaTransporte);
+
+    List<Envio> findByUsuarioId(Long usuarioId);
 }

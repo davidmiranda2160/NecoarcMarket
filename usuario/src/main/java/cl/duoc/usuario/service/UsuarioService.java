@@ -3,33 +3,27 @@ package cl.duoc.usuario.service;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cl.duoc.usuario.Client.PagosClient;
-import cl.duoc.usuario.dto.PagosRequest;
-import cl.duoc.usuario.dto.PagosResponse;
 import cl.duoc.usuario.dto.UsuarioRequest;
 import cl.duoc.usuario.dto.UsuarioResponse;
 import cl.duoc.usuario.mapper.UsuarioMapper;
 import cl.duoc.usuario.model.Usuario;
 import cl.duoc.usuario.repository.UsuarioRespository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 @Transactional
+@RequiredArgsConstructor
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRespository usuarioRespository;
+    
+    private final UsuarioRespository usuarioRespository;
 
-    @Autowired
-    private PagosClient pagosClient;
-
-    @Autowired
-    private UsuarioMapper usuarioMapper;
+    private final UsuarioMapper usuarioMapper;
 
     public List<Usuario> listarUsuarios() {
         log.info("Solicitando el listado completo de todos los usuarios registrados");
@@ -105,29 +99,6 @@ public class UsuarioService {
 
         usuarioRespository.deleteById(id);
         log.info("Usuario con el id {} eliminado correctamente del sistema", id);
-    }
-
-    public PagosResponse solicitarPago(Long usuarioId, PagosRequest request) {
-        log.info("Usuario con el id {} solicita procesar un pago externo de monto: ${}", usuarioId, request.getMontoAPagar());
-
-        usuarioRespository.findById(usuarioId)
-                .orElseThrow(() -> {
-                    log.warn("Solicitud de pago abortada: El usuario solicitante con id {} no existe", usuarioId);
-                    return new NoSuchElementException("No existe el usuario con el id: " + usuarioId);
-                });
-
-        log.info("Comunicandose con el microservicio externo de pagos para la orden con id: {}", request.getIdOrden());
-        PagosResponse response = pagosClient.crearPago(request);
-        log.info("El microservicio de pagos respondio correctamente para el usuario con id: {}", usuarioId);
-
-        return response;
-    }
-
-    public List<PagosResponse> obtenerHistorialPagos() {
-        log.info("Solicitando el historial general de transacciones al microservicio de Pagos");
-        List<PagosResponse> historial = pagosClient.listarPagos();
-        log.info("Historial de pagos obtenido. Registros devueltos: {}", historial.size());
-        return historial;
     }
 
 }

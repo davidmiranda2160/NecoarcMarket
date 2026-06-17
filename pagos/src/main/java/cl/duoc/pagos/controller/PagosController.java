@@ -2,7 +2,6 @@ package cl.duoc.pagos.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,15 +15,16 @@ import cl.duoc.pagos.dto.PagosRequest;
 import cl.duoc.pagos.dto.PagosResponse;
 import cl.duoc.pagos.service.PagosService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("v1/pagos")
 @Slf4j
+@RequiredArgsConstructor
 public class PagosController {
 
-    @Autowired
-    private PagosService pagosService;
+    private final PagosService pagosService;
 
     @GetMapping
     public ResponseEntity<List<PagosResponse>> listarTodos() {
@@ -38,7 +38,7 @@ public class PagosController {
         return ResponseEntity.ok(pagosService.obtenerPagoPorOrden(id));
     }
 
-    @PostMapping("/crear")
+    @PostMapping
     public ResponseEntity<PagosResponse> procesarPago(@Valid @RequestBody PagosRequest request) {
         log.info("Procesando nuevo pago para la orden: {}", request.getIdOrden());
         return ResponseEntity.status(HttpStatus.CREATED).body(pagosService.procesarPago(request));

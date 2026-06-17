@@ -1,6 +1,8 @@
 package cl.duoc.envio.dto;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,10 +15,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OrdenesResponse {
     private Long id;
-    private Long idUsuario;
-    private Date fechaCreacion;
+    private Long usuarioId;
+    private BigDecimal total;
     private String estadoOrden;
-    private double montoTotal;
-    private String direccionEnvio;
-    private Long idPago;
+    private LocalDateTime fechaOrden;
+    private List<OrdenesDetalleResponse> detalles;
 }

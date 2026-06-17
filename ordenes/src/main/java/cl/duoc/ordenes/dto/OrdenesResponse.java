@@ -20,4 +20,5 @@ public class OrdenesResponse {
     private String estadoOrden;
     private LocalDateTime fechaOrden;
     private List<CarritoResponse> items; 
+    private List<OrdenesDetalleResponse> detalles;
 }

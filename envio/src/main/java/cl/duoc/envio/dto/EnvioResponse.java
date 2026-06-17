@@ -1,6 +1,7 @@
 package cl.duoc.envio.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,7 @@ public class EnvioResponse {
     private String empresaTransporte;
     private LocalDate fechaEstimadaEntrega;
     private String direccionDestino;
+    private LocalDateTime fechaCreacion;
 
     private OrdenesResponse orden;
 }

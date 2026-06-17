@@ -1,12 +1,11 @@
 package cl.duoc.envio.service;
 
-
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cl.duoc.envio.client.OrdenesClient;
@@ -17,23 +16,22 @@ import cl.duoc.envio.mapper.EnvioMapper;
 import cl.duoc.envio.model.Envio;
 import cl.duoc.envio.repository.EnvioRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 @Transactional
+@RequiredArgsConstructor
 public class EnvioService {
 
-    @Autowired
-    private EnvioRepository envioRepository;
+    private final EnvioRepository envioRepository;
+    private final EnvioMapper envioMapper;
+    private final OrdenesClient ordenesClient;
 
-    @Autowired
-    private EnvioMapper envioMapper;
-
-    @Autowired
-    private OrdenesClient ordenesClient;
-
-    public EnvioResponse crearEnvio(EnvioRequest request, Long ordenId) {
+    public EnvioResponse crearEnvio(EnvioRequest request) {
+        Long ordenId = request.getOrdenId();
+        
         OrdenesResponse orden = ordenesClient.buscarOrdenPorId(ordenId);
         if (orden == null) {
             log.warn("No se pudo crear el envio: la orden con id {} no existe en el sistema", ordenId);
@@ -43,9 +41,11 @@ public class EnvioService {
         Envio envio = envioMapper.fromRequest(request);
         
         envio.setOrdenId(ordenId);
-        envio.setEstadoEnvio("Realizodo");
-        envio.setNumeroSeguimiento("ENV-" + ordenId); //El numero de seguimiento se construye con el id del cliente
-        envio.setFechaEstimadaEntrega(LocalDate.now());
+        envio.setUsuarioId(request.getUsuarioId());
+        envio.setEstadoEnvio("Pendiente");
+        envio.setNumeroSeguimiento("ENV-" + ordenId); 
+        envio.setFechaCreacion(LocalDateTime.now());
+        envio.setFechaEstimadaEntrega(LocalDate.now().plusDays(3)); 
 
         Envio guardado = envioRepository.save(envio);
         log.info("El envio fue creado exitosamente. id generado: {} - Tracking: {}", guardado.getId(), guardado.getNumeroSeguimiento());
@@ -69,7 +69,6 @@ public class EnvioService {
     public EnvioResponse obtenerPorId(Long id) {
         log.info("Buscando envio con id: {}", id);
         
-       
         Envio envio = envioRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Consulta fallida: el envío con id {} no existe", id);
@@ -94,14 +93,11 @@ public class EnvioService {
                     return new NoSuchElementException("No se puede actualizar el estado porque no existe el envio con id: " + id);
                 });
 
-        envio.setEstadoEnvio(nuevoEstado);
+        envio.setEstadoEnvio(nuevoEstado.toUpperCase().trim());
         Envio actualizado = envioRepository.save(envio);
         log.info("Estado del envio id {} actualizado con exito a '{}'", id, nuevoEstado);
 
         OrdenesResponse orden = ordenesClient.buscarOrdenPorId(actualizado.getOrdenId());
         return envioMapper.toResponse(actualizado, orden);
     }
-
-    
 }
-
