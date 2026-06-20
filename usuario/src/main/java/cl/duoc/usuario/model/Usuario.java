@@ -26,7 +26,10 @@ public class Usuario {
     private String nombre;
 
     @Column(nullable= false, length= 150)
-    private String apellidos;
+    private String appaterno;
+
+    @Column(nullable= true, length= 150)
+    private String apmaterno;
 
     @Column(nullable= false, length= 255)
     private String correo;

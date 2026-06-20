@@ -1,0 +1,72 @@
+spring:
+    application:
+        name: usuario-service
+
+#Configuramos y activamos el perfil de dev para que se levante el DataLoader
+    profiles:
+        active: Dev
+
+    mvc:
+        format:
+            date-time: iso
+
+#Configuracion de Swagger
+
+springdoc:
+    api-docs:
+        enabled: true
+    swagger-ui:
+        enabled: true
+        path: /doc/swagger-ui.html
+
+#URL de microservicios externos
+
+services:
+    usuario:
+        baseUrl: http://localhost:8080
+    pagos:
+        baseUrl: http://localhost:8092
+
+#Configuracion de Logs
+
+logging:
+  level:
+    cl:
+        duoc:
+            usuario: INFO
+        org:
+            hibernate:
+                SQL: DEBUG
+
+---
+
+#Configuracion del perfil Dev 
+
+spring:
+    config:
+        activate:
+            on-profile: Dev
+
+#Configuracion del JPA con hibernate
+
+    datasource:
+        url: jdbc:mysql://localhost:3306/db_necoarcmarket_usuarios?createDatabaseIfNotExist=true&serverTimezone=UTC
+        username: root
+        password: ""
+        driver-class-name: com.mysql.cj.jdbc.Driver
+
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
+
+#Configuracion para que Flyway funcione
+
+    flyway:
+        enabled: true
+        baseline-on-migrate: true
+
+    
