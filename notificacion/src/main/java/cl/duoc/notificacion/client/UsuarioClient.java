@@ -49,7 +49,7 @@ public class UsuarioClient {
         try {
             UsuarioResponse user = obtenerDatosUsuario(id);
             if (user != null) {
-                return user.getNombre() + " " + user.getApellidos();
+                return user.getNombre() + " " + user.getAppaterno();
             }
         } catch (Exception e) {
             log.warn("Usando nombre de respaldo para ID {} debido a un error en el cliente", id);

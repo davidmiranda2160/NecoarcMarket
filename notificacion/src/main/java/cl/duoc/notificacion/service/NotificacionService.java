@@ -34,7 +34,7 @@ public class NotificacionService {
     public List<NotificacionResponse> listarPorUsuario(Long id) {
         log.info("Consultando historial de notificaciones para el usuario ID: {}", id);      
         UsuarioResponse user = usuarioClient.obtenerDatosUsuario(id);
-        String nombreCompleto = (user != null) ? user.getNombre() + " " + user.getApellidos() : "Usuario Desconocido";
+        String nombreCompleto = (user != null) ? user.getNombre() + " " + user.getAppaterno() : "Usuario Desconocido";
         
         List<Notificacion> notificaciones = notificacionRepository.findByUsuarioIdOrderByFechaEnvioDesc(id);
         
@@ -55,7 +55,7 @@ public class NotificacionService {
         n.setTipo(request.getTipo());
         n.setFechaEnvio(LocalDateTime.now());
         if(user != null) {
-            String saludo = "Hola " + user.getNombre() + " " + user.getApellidos();
+            String saludo = "Hola " + user.getNombre() + " " + user.getApmaperno();
             n.setMensaje(saludo + ": " + request.getMensaje());
             log.info("Notificación personalizada creada con éxito para usuario ID (owo): {}", request.getUsuarioId());
         } else {
