@@ -25,7 +25,7 @@ logging:
   level:
     cl:
         duoc:
-            usuario: INFO
+            inventario: INFO
         org:
             hibernate:
                 SQL: DEBUG

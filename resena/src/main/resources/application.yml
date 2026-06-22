@@ -25,7 +25,7 @@ logging:
   level:
     cl:
         duoc:
-            usuario: INFO
+            resena: INFO
         org:
             hibernate:
                 SQL: DEBUG
@@ -71,4 +71,4 @@ server:
 
 services:
   usuario:
-    baseUrl: http://localhost:8080/v1/usuario
+    baseUrl: http://localhost:8080
