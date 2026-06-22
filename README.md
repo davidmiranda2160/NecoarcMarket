@@ -151,7 +151,7 @@ Entidad financiera interna del Marketplace encargada de validar montos, procesar
 | `ms-productos` | **8081** | `db_necoarcmarket_productos` | `ms-inventario` (8082) |
 | `ms-inventario` | **8082** | `db_necoarcmarket_inventario` | `ms-producto` (8081) |
 | `ms-busqueda` | **8083** | `db_necoarcmarket_busqueda` | `ms-productos` (8081) y `ms-inventario` (8082) |
-| `ms-resena` | **8086** | `db_necoarcmarket_resenas` | `ms-productos` (8081) |
+| `ms-resena` | **8086** | `db_necoarcmarket_resenas` | `ms-usuario` (8080) |
 | `ms-notificacion`| **8085** | `db_necoarcmarket_notificacion` | `ms-usuario` (8080) |
 | `ms-envio` | **8084** | `db_necoarcmarket_envio` | `ms-ordenes` (8088) |
 | `ms-carrito` | **8087** | `db_necoarcmarket_carrito` | `ms-usuario` (8080) y `ms-productos` (8081) |

@@ -1,0 +1,74 @@
+spring:
+    application:
+        name: resena-service
+
+#Configuramos y activamos el perfil de dev para que se levante el DataLoader
+    profiles:
+        active: dev
+
+    mvc:
+        format:
+            date-time: iso
+
+#Configuracion de Swagger
+
+springdoc:
+    api-docs:
+        enabled: true
+    swagger-ui:
+        enabled: true
+        path: /doc/swagger-ui.html
+
+#Configuracion de Logs
+
+logging:
+  level:
+    cl:
+        duoc:
+            usuario: INFO
+        org:
+            hibernate:
+                SQL: DEBUG
+
+---
+
+#Configuracion del perfil Dev 
+
+spring:
+    config:
+        activate:
+            on-profile: dev
+
+#Configuracion del JPA con hibernate
+
+    datasource:
+        url: jdbc:mysql://localhost:3306/db_necoarcmarket_resena?createDatabaseIfNotExist=true&serverTimezone=UTC
+        username: root
+        password: ""
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        hikari:
+            initialization-fail-timeout: 5000  # Si en 5 segundos Laragon no responde, el programa se apaga solo
+            connection-timeout: 5000
+
+    jpa:
+        hibernate:
+            ddl-auto: validate
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
+
+#Configuracion para que Flyway funcione
+
+    flyway:
+        enabled: true
+        baseline-on-migrate: true
+
+
+#ubicacion de puertos
+server:
+  port: 8086
+
+services:
+  usuario:
+    baseUrl: http://localhost:8080/v1/usuario

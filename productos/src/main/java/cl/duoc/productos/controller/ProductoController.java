@@ -19,12 +19,14 @@ import cl.duoc.productos.dto.ProductoResponse;
 import cl.duoc.productos.dto.ProductoUpdateRequest;
 import cl.duoc.productos.model.Producto;
 import cl.duoc.productos.service.ProductoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/v1/productos")
 @Slf4j
+@Tag(name = "Producto", description = "Operaciones relacionadas con el microservicio de productos")
 public class ProductoController {
 
     @Autowired
@@ -38,26 +40,26 @@ public class ProductoController {
 
     @GetMapping("/{id}")
     public ProductoResponse buscarProductoPorId(@PathVariable Long id){
-        log.info("GET /api/productos/buscarProductoPorId/{}", id);
+        log.info("GET /v1/productos/{}", id);
         return productoService.buscarProductoPorId(id);
     }
 
     //obtener cosa por nombre
     @GetMapping("/nombrep/{nombrep}")
     public ProductoResponse buscarProductoPorNombre(@PathVariable String nombrep){
-        log.info("GET /api/productos/buscarProductoPorNombre/{}", nombrep);
+        log.info("GET /v1/productos/buscarProductoPorNombre/{}", nombrep);
         return productoService.buscarProductoPorNombre(nombrep);
     }
 
     @PostMapping()
     public ResponseEntity<ProductoResponse> crearProducto(@Valid @RequestBody ProductoRequest request){
-        log.info("POST /api/productos/crearProducto");
+        log.info("POST /v1/productos");
         return ResponseEntity.status(HttpStatus.CREATED).body(productoService.crearProducto(request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductoResponse> actualizarProducto(@PathVariable Long id, @Valid @RequestBody ProductoUpdateRequest request){
-        log.info("PUT /api/productos/actualizarProducto/{}", id);
+        log.info("PUT /v1/productos/{}", id);
         return ResponseEntity.ok().body(productoService.actualizarProducto(id, request));
     }
 
