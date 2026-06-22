@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import cl.duoc.usuario.dto.UsuarioRequest;
 import cl.duoc.usuario.dto.UsuarioResponse;
+import cl.duoc.usuario.dto.UsuarioUpdateRequest;
 import cl.duoc.usuario.mapper.UsuarioMapper;
 import cl.duoc.usuario.model.Usuario;
 import cl.duoc.usuario.repository.UsuarioRepository;
@@ -20,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UsuarioService {
 
-    
     private final UsuarioRepository usuarioRepository;
 
     private final UsuarioMapper usuarioMapper;
@@ -34,6 +34,12 @@ public class UsuarioService {
 
     public UsuarioResponse crearUsuario(UsuarioRequest request) {
         log.info("Intentando registrar un nuevo usuario con correo: {}", request.getCorreo());
+
+        if (usuarioRepository.existsByCorreo(request.getCorreo())) {
+            log.warn("La creacion fallo: El correo electronico '{}' ya esta registrado", request.getCorreo());
+
+            throw new IllegalArgumentException("El correo electrónico ya se encuentra registrado en el sistema");
+        }
 
         Usuario usuario = usuarioMapper.fromRequest(request);
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
@@ -55,27 +61,35 @@ public class UsuarioService {
         return usuarioMapper.toResponse(usuario);
     }
 
-    public UsuarioResponse actualizarUsuario(Long id, UsuarioRequest datosNuevos) {
+    public UsuarioResponse actualizarUsuario(Long id, UsuarioUpdateRequest datosNuevos) {
         log.info("Buscando usuario con el id: {} para iniciar la actualizacion de datos", id);
 
+        
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("La actualizacion fallo: El usuario con el id {} no se puede actualizar porque no existe", id);
+                    log.warn("La actualizacion fallo: El usuario con el id {} no existe", id);
                     return new NoSuchElementException("No existe el usuario " + id + " a actualizar");
                 });
+
+        if (datosNuevos.getCorreo() != null && !datosNuevos.getCorreo().equals(usuarioExistente.getCorreo())) {
+            log.info("El usuario intenta cambiar su correo de '{}' a '{}'. Verificando disponibilidad...",
+                    usuarioExistente.getCorreo(), datosNuevos.getCorreo());
+
+            if (usuarioRepository.existsByCorreo(datosNuevos.getCorreo())) {
+                log.warn("La actualizacion fallo: El correo '{}' ya pertenece a otro usuario", datosNuevos.getCorreo());
+                throw new IllegalArgumentException("El nuevo correo electrónico ya se encuentra registrado en el sistema");
+            }
+        }
 
         if (datosNuevos.getNombre() != null) {
             usuarioExistente.setNombre(datosNuevos.getNombre());
         }
-
         if (datosNuevos.getAppaterno() != null) {
             usuarioExistente.setAppaterno(datosNuevos.getAppaterno());
         }
-
         if (datosNuevos.getApmaterno() != null) {
             usuarioExistente.setApmaterno(datosNuevos.getApmaterno());
         }
-
         if (datosNuevos.getCorreo() != null) {
             usuarioExistente.setCorreo(datosNuevos.getCorreo());
         }
@@ -90,7 +104,7 @@ public class UsuarioService {
         }
 
         Usuario usuarioActualizado = usuarioRepository.save(usuarioExistente);
-        log.info("Los datos del usuario con el id {} fueron actualizados correctamente en la base de datos", id);
+        log.info("Los datos del usuario con el id {} fueron actualizados correctamente", id);
 
         return usuarioMapper.toResponse(usuarioActualizado);
     }

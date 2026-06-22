@@ -1,0 +1,90 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            #Microservicio de Usuarios
+            - id: ms-usuario-route
+              uri: http://localhost:8080
+              predicates:
+                - Path=/v1/usuario/**
+              filters:
+                - AddRequestHeader=X-Gateway-Source, api-gateway
+
+            #Microservicio de Productos
+            - id: ms-productos-route
+              uri: http://localhost:8081
+              predicates:
+                - Path=/v1/productos/**
+              filters:
+                - AddRequestHeader=X-Gateway-Source, api-gateway
+
+            #Microservicio de Inventario 
+            - id: ms-inventario-route
+              uri: http://localhost:8082
+              predicates:
+                - Path=/v1/inventario/**
+              filters:
+                - AddRequestHeader=X-Gateway-Source, api-gateway
+
+            #Microservicio de Búsqueda
+            - id: ms-busqueda-route
+              uri: http://localhost:8083
+              predicates:
+                - Path=/v1/busqueda/**
+              filters:
+                - AddRequestHeader=X-Gateway-Source, api-gateway
+
+            #Microservicio de Envío
+            - id: ms-envio-route
+              uri: http://localhost:8084
+              predicates:
+                - Path=/v1/envio/**
+              filters:
+                - AddRequestHeader=X-Gateway-Source, api-gateway
+
+            #Microservicio de Notificaciones
+            - id: ms-notificacion-route
+              uri: http://localhost:8085
+              predicates:
+                - Path=/v1/notificacion/**
+              filters:
+                - AddRequestHeader=X-Gateway-Source, api-gateway
+
+            #Microservicio de Reseñas
+            - id: ms-resena-route
+              uri: http://localhost:8086
+              predicates:
+                - Path=/v1/resena/**
+              filters:
+                - AddRequestHeader=X-Gateway-Source, api-gateway
+
+            #Microservicio de Carrito
+            - id: ms-carrito-route
+              uri: http://localhost:8087
+              predicates:
+                - Path=/v1/carrito/**
+              filters:
+                - AddRequestHeader=X-Gateway-Source, api-gateway
+
+            #Microservicio de Órdenes
+            - id: ms-ordenes-route
+              uri: http://localhost:8088
+              predicates:
+                - Path=/v1/ordenes/**
+              filters:
+                - AddRequestHeader=X-Gateway-Source, api-gateway
+
+            #Microservicio de Pagos
+            - id: ms-pagos-route
+              uri: http://localhost:8092
+              predicates:
+                - Path=/v1/pagos/**
+              filters:
+                - AddRequestHeader=X-Gateway-Source, api-gateway

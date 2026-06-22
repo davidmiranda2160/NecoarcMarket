@@ -15,7 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cl.duoc.carrito.dto.CarritoRequest;
 import cl.duoc.carrito.dto.CarritoResponse;
+import cl.duoc.carrito.dto.UsuarioResponse;
 import cl.duoc.carrito.service.CarritoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +35,13 @@ public class CarritoController {
     private final CarritoService carritoService;
 
     @GetMapping("/usuario/{idUsuario}")
+     @Operation(summary= "Obtener carrito de un usuario", description= "Busca a un carrito mediante el id de un usuario")
+    @ApiResponses(value = {
+        @ApiResponse( responseCode = "200", description= "El carrito del usuario ha sido encontrado",
+            content= @Content(mediaType = "application/json",
+                schema = @Schema(implementation = UsuarioResponse.class))),
+        @ApiResponse(responseCode= "404", description= "El carrito del usuario no fue encontrado")
+    })
     public ResponseEntity<List<CarritoResponse>> obtenerCarritoPorUsuario(@PathVariable Long idUsuario) {
         log.info("GET /v1/carrito/usuario/{}", idUsuario);
         List<CarritoResponse> carrito = carritoService.obtenerCarritoPorUsuario(idUsuario);
@@ -36,6 +49,13 @@ public class CarritoController {
     }
 
     @PostMapping("/{idUsuario}/{idProducto}")
+    @Operation(summary= "Crear un carrito", description= "Crea un crea un carrito usando el id del usuario y el del producto que desea")
+    @ApiResponses(value = {
+        @ApiResponse( responseCode = "201", description= "El carrito fue creado",
+            content= @Content(mediaType = "application/json",
+                schema = @Schema(implementation = UsuarioResponse.class))),
+        @ApiResponse(responseCode= "404", description= "El carrito no se pudo crear")
+    })
     public ResponseEntity<CarritoResponse> agregarProducto(@PathVariable Long idUsuario,
             @PathVariable Long idProducto,
             @Valid @RequestBody CarritoRequest request) {
@@ -46,6 +66,13 @@ public class CarritoController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary= "Actualizar a la cantidad de productos", description= "Actualiza la cantidad de productos de un carrito")
+    @ApiResponses(value = {
+        @ApiResponse( responseCode = "200", description= "La cantidad fue actualizado correctamente",
+            content= @Content(mediaType = "application/json",
+                schema = @Schema(implementation = UsuarioResponse.class))),
+        @ApiResponse(responseCode= "404", description= "El usuario no se pudo actualizar")
+    })
     public ResponseEntity<CarritoResponse> actualizarCarrito(@PathVariable Long id,
             @Valid @RequestBody CarritoRequest request) {
         log.info("PUT /v1/carrito/{} - Actualizando cantidades", id);
@@ -55,6 +82,12 @@ public class CarritoController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary= "Elimina un producto del carrito", description= "Elimina un producto del carrito del usuario utilizando el id del producto")
+    @ApiResponses(value = {
+        @ApiResponse( responseCode = "204", description= "El producto fue eliminado",
+            content= @Content(mediaType = "application/json")),
+        @ApiResponse(responseCode= "404", description= "El producto no se pudo eliminar")
+    })
     public ResponseEntity<Void> eliminarProductoPorId(@PathVariable Long id) {
         log.info("DELETE /v1/carrito/{} - Eliminando ítem", id);
 
@@ -63,6 +96,12 @@ public class CarritoController {
     }
 
     @DeleteMapping("/usuario/{idUsuario}")
+    @Operation(summary= "Vaciar un carrito", description= "Utiliza el id del usuario y llama al metodo para vaciar el carrito de un usuario especifico")
+    @ApiResponses(value = {
+        @ApiResponse( responseCode = "204", description= "El carrito fue vaciado",
+            content= @Content(mediaType = "application/json")),
+        @ApiResponse(responseCode= "404", description= "El carrito no se pudo vaciar")
+    })
     public ResponseEntity<Void> limpiarCarrito(@PathVariable Long idUsuario) {
         log.info("Vaciando carrito del usuario: {}", idUsuario);
         carritoService.vaciarCarrito(idUsuario);

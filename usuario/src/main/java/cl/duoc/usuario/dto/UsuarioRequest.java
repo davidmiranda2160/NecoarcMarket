@@ -29,7 +29,7 @@ public class UsuarioRequest {
     @Size(min = 2, max = 100, message = "Los apellido materno deben tener entre 2 y 100 caracteres")
     private String apmaterno;
 
-    @Schema(description= "Correo del usuario", example= "Esteban.quito@test.cl")
+    @Schema(description= "Correo del usuario", example= "e.quinto@gmail.com")
     @NotBlank(message = "El correo es obligatorio")
     @Email(message = "El correo debe ser válido")    
     @Size(max = 150, message = "El correo no puede superar los 150 caracteres")

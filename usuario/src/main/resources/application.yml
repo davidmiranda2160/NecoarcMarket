@@ -4,7 +4,7 @@ spring:
 
 #Configuramos y activamos el perfil de dev para que se levante el DataLoader
     profiles:
-        active: Dev
+        active: dev
 
     mvc:
         format:
@@ -18,14 +18,6 @@ springdoc:
     swagger-ui:
         enabled: true
         path: /doc/swagger-ui.html
-
-#URL de microservicios externos
-
-services:
-    usuario:
-        baseUrl: http://localhost:8080
-    pagos:
-        baseUrl: http://localhost:8092
 
 #Configuracion de Logs
 
@@ -45,7 +37,7 @@ logging:
 spring:
     config:
         activate:
-            on-profile: Dev
+            on-profile: dev
 
 #Configuracion del JPA con hibernate
 
@@ -54,10 +46,13 @@ spring:
         username: root
         password: ""
         driver-class-name: com.mysql.cj.jdbc.Driver
+        hikari:
+            initialization-fail-timeout: 5000  # Si en 5 segundos Laragon no responde, el programa se apaga solo
+            connection-timeout: 5000
 
     jpa:
         hibernate:
-            ddl-auto: update
+            ddl-auto: validate
         show-sql: true
         properties:
             hibernate:
@@ -68,5 +63,3 @@ spring:
     flyway:
         enabled: true
         baseline-on-migrate: true
-
-    

@@ -26,6 +26,7 @@ es quien se encarga de las operaciones CRUD en la base de datos local y la forma
 y la comunicacion con los microservicios de Usuario y Productos, todo es 
 transaccional lo que garantiza consistencia en los datos
  */
+
 @Service
 @Slf4j
 @Transactional

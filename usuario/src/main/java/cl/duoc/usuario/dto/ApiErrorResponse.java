@@ -14,9 +14,14 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ApiErrorResponse {
     private LocalDateTime timestamp;
+
     private Integer status;
+
     private String error;
+
     private String message;
+
     private String path;
+
     private List<String> errors;
 }
