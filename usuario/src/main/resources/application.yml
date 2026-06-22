@@ -10,6 +10,10 @@ spring:
         format:
             date-time: iso
 
+# Puerto del microservicio
+server:
+  port: 8080
+
 #Configuracion de Swagger
 
 springdoc:

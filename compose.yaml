@@ -1,0 +1,252 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${MYSQL_ROOT_PASSWORD}"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spring-cloud-net
+
+  usuario:
+    build:
+      context: ./usuario
+      dockerfile: Dockerfile
+    container_name: usuario
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: db_necoarcmarket_usuario
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - spring-cloud-net
+
+  productos:
+    build:
+      context: ./productos
+      dockerfile: Dockerfile
+    container_name: productos-service
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: db_necoarcmarket_productos
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - spring-cloud-net
+
+  inventario:
+    build:
+      context: ./inventario
+      dockerfile: Dockerfile
+    container_name: ms-inventario
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: db_necoarcmarket_inventario
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - spring-cloud-net
+
+  busqueda:
+    build:
+      context: ./busqueda
+      dockerfile: Dockerfile
+    container_name: ms-busqueda
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: db_necoarcmarket_busqueda
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - spring-cloud-net
+
+  envio:
+    build:
+      context: ./envio
+      dockerfile: Dockerfile
+    container_name: envio-service
+    restart: unless-stopped
+    ports:
+      - "8084:8084"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: db_necoarcmarket_envio
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - spring-cloud-net
+
+  notificacion:
+    build:
+      context: ./notificacion
+      dockerfile: Dockerfile
+    container_name: notificacion-service
+    restart: unless-stopped
+    ports:
+      - "8085:8085"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: db_necoarcmarket_notificacion
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - spring-cloud-net
+
+  resena:
+    build:
+      context: ./resena
+      dockerfile: Dockerfile
+    container_name: resena-service
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: db_necoarcmarket_resenas
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - spring-cloud-net
+
+  carrito:
+    build:
+      context: ./carrito
+      dockerfile: Dockerfile
+    container_name: carrito-service
+    restart: unless-stopped
+    ports:
+      - "8087:8087"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: db_necoarcmarket_carrito
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - spring-cloud-net
+
+  ordenes:
+    build:
+      context: ./ordenes
+      dockerfile: Dockerfile
+    container_name: ordenes-service
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: db_necoarcmarket_ordenes
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - spring-cloud-net
+
+  pagos:
+    build:
+      context: ./pagos
+      dockerfile: Dockerfile
+    container_name: pagos-service
+    restart: unless-stopped
+    ports:
+      - "8092:8092"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: db_necoarcmarket_pagos
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - spring-cloud-net
+  
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - spring-cloud-net
+
+volumes:
+  mysql_data:
+
+networks:
+  spring-cloud-net:
+    driver: bridge
