@@ -18,7 +18,7 @@ public class UsuarioClient {
     public UsuarioResponse obtenerDatosUsuario(Long id) {
         try {
             return webClient.get()
-                    .uri("/v1/usuarios/{id}", id) 
+                    .uri("/v1/usuario/{id}", id) 
                     .retrieve()
                     .bodyToMono(UsuarioResponse.class)
                     .block(); 

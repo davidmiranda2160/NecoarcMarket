@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import cl.duoc.busqueda.client.EnvioClient;
+import cl.duoc.busqueda.dto.BusquedaRequest;
 import cl.duoc.busqueda.dto.BusquedaResponse;
 import cl.duoc.busqueda.dto.EnvioResponse;
 import cl.duoc.busqueda.mapper.BusquedaMapper;
@@ -47,6 +48,14 @@ public class BusquedaService {
             log.warn("No se pudo conectar con Envíos. Usando estado local de respaldo: {}", e.getMessage());
         }
         return busquedaMapper.toResponse(busquedaLocal, estadoFinal);
+    }
+    public BusquedaResponse registrarNuevoSeguimiento(BusquedaRequest request) {
+        log.info("Registrando nuevo código en el sistema: {}", request.getCodigoSeguimiento());
+        Busqueda nuevaBusqueda = busquedaMapper.fromRequest(request);
+
+        Busqueda guardada = busquedaRepository.save(nuevaBusqueda);
+
+        return busquedaMapper.toResponse(guardada, request.getEstadoEnvio());
     }
 }
 

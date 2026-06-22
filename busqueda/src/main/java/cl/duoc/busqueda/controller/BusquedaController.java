@@ -1,6 +1,7 @@
 package cl.duoc.busqueda.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,10 +32,9 @@ public class BusquedaController {
         return ResponseEntity.ok(respuesta);
     }
     
-    @PostMapping("/rastrear")
-    public ResponseEntity<BusquedaResponse> rastrearPedido(@Valid @RequestBody BusquedaRequest request) {
-        log.info("POST /v1/busqueda/rastrear - Solicitud de rastreo para el código: {}", request.getCodigoSeguimiento());
-        BusquedaResponse respuesta = busquedaService.obtenerSeguimientoCompleto(request.getCodigoSeguimiento());
-        return ResponseEntity.ok(respuesta);
-    }
+    @PostMapping("/registrar")
+    public ResponseEntity<BusquedaResponse> registrarPedido(@Valid @RequestBody BusquedaRequest request) {
+        BusquedaResponse respuesta = busquedaService.registrarNuevoSeguimiento(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+}
 }

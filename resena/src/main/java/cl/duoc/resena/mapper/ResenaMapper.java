@@ -28,6 +28,7 @@ public class ResenaMapper {
         return ResenaResponse.builder()
                 .id(resena.getId()) 
                 .productoId(resena.getProductoId())
+                .usuarioId(resena.getUsuarioId())
                 .nombreUsuario(nombreUsuario) 
                 .calificacion(resena.getCalificacion())
                 .comentario(resena.getComentario())
