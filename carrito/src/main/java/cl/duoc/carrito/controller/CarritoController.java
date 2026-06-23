@@ -19,6 +19,7 @@ import cl.duoc.carrito.dto.UsuarioResponse;
 import cl.duoc.carrito.service.CarritoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -39,7 +40,13 @@ public class CarritoController {
     @ApiResponses(value = {
         @ApiResponse( responseCode = "200", description= "El carrito del usuario ha sido encontrado",
             content= @Content(mediaType = "application/json",
-                schema = @Schema(implementation = UsuarioResponse.class))),
+                schema = @Schema(implementation = UsuarioResponse.class),
+            examples= @ExampleObject(
+            name = "El carrito de usuario ha sido encontrado",
+            value = """
+                    
+                    """
+            ))),
         @ApiResponse(responseCode= "404", description= "El carrito del usuario no fue encontrado")
     })
     public ResponseEntity<List<CarritoResponse>> obtenerCarritoPorUsuario(@PathVariable Long idUsuario) {

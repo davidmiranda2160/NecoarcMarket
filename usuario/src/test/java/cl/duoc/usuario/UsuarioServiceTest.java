@@ -1,6 +1,8 @@
 package cl.duoc.usuario;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import cl.duoc.usuario.dto.UsuarioRequest;
 import cl.duoc.usuario.dto.UsuarioResponse;
+import cl.duoc.usuario.dto.UsuarioUpdateRequest;
 import cl.duoc.usuario.mapper.UsuarioMapper;
 import cl.duoc.usuario.model.Usuario;
 import cl.duoc.usuario.repository.UsuarioRepository;
@@ -127,7 +130,7 @@ public class UsuarioServiceTest {
         UsuarioResponse responseSimulado = new UsuarioResponse();
         responseSimulado.setId(10L);
         responseSimulado.setNombre("Esteban");
-        responseSimulado.setCorreo("esteban.quinto@test.cl");
+        responseSimulado.setCorreo("Esteban.quinto@test.cl");
 
         when(usuarioRepository.existsByCorreo(request.getCorreo())).thenReturn(false);
 
@@ -165,7 +168,6 @@ public class UsuarioServiceTest {
             usuarioService.crearUsuario(request);
         }, "Se esperaba un IllegalArgumentException debido al correo duplicado");
 
-        // Validamos el mensaje de error directamente sin usar bloques try-catch
         assertEquals("El correo electrónico ya se encuentra registrado en el sistema", excepcionIdéntica.getMessage());
 
         verify(usuarioRepository, times(1)).existsByCorreo(request.getCorreo());
@@ -174,5 +176,168 @@ public class UsuarioServiceTest {
         verify(usuarioRepository, never()).save(any(Usuario.class));
     }
     
+    @Test
+    @DisplayName("Debería retornar el usuario correspondiente cuando el ID existe")
+    void debeObtenerUsuarioPorIdExitosamente() {
+
+    Long id = 1L;
+    
+    Usuario usuario = new Usuario();
+    usuario.setId(id);
+
+    UsuarioResponse responseSimulado = new UsuarioResponse();
+    responseSimulado.setId(id);
+    responseSimulado.setNombre("Esteban");
+    responseSimulado.setAppaterno("Quinto");
+    responseSimulado.setApmaterno("Gonzales");
+    responseSimulado.setCorreo("esteban.quinto@test.cl");
+    responseSimulado.setDireccion("Calle falsa 123");
+    responseSimulado.setTelefono("+569978996777");
+    responseSimulado.setTipoUsuario("Cliente");
+
+    when(usuarioRepository.findById(id)).thenReturn(Optional.of(usuario));
+    when(usuarioMapper.toResponse(usuario)).thenReturn(responseSimulado);
+
+    UsuarioResponse resultado = usuarioService.obtenerUsuarioPorId(id);
+
+    assertNotNull(resultado);
+    assertEquals(id, resultado.getId());
+    assertEquals("Esteban", resultado.getNombre());
+    assertEquals("Quinto", resultado.getAppaterno());
+    assertEquals("Gonzales", resultado.getApmaterno());
+    assertEquals("esteban.quinto@test.cl", resultado.getCorreo());
+    assertEquals("Calle falsa 123", resultado.getDireccion());
+    assertEquals("+569978996777", resultado.getTelefono());
+    assertEquals("Cliente", resultado.getTipoUsuario());
+
+    verify(usuarioRepository, times(1)).findById(id);
+    verify(usuarioMapper, times(1)).toResponse(usuario);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar NoSuchElementException cuando el ID buscado no existe")
+    void debeLanzarExcepcionCuandoUsuarioNoExisteAlObtener() {
+        Long id = 99L;
+        when(usuarioRepository.findById(id)).thenReturn(Optional.empty());
+
+        NoSuchElementException excepcion = assertThrows(NoSuchElementException.class, () -> {
+            usuarioService.obtenerUsuarioPorId(id);
+        });
+
+        assertEquals("No se encontro el usuario con id: " + id, excepcion.getMessage());
+        verify(usuarioRepository, times(1)).findById(id);
+        verify(usuarioMapper, never()).toResponse(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("Debería actualizar los datos correctamente si el usuario existe y el correo no está duplicado")
+    void debeActualizarUsuarioExitosamente() {
+        Long id = 1L;
+        UsuarioUpdateRequest updateRequest = new UsuarioUpdateRequest();
+        updateRequest.setNombre("Esteban Modificado");
+        updateRequest.setCorreo("nuevo.correo@test.cl");
+
+        Usuario usuarioExistente = new Usuario();
+        usuarioExistente.setId(id);
+        usuarioExistente.setNombre("Esteban");
+        usuarioExistente.setCorreo("esteban.quinto@test.cl");
+
+        Usuario usuarioGuardado = new Usuario();
+        usuarioGuardado.setId(id);
+        usuarioGuardado.setNombre("Esteban Modificado");
+        usuarioGuardado.setCorreo("nuevo.correo@test.cl");
+
+        UsuarioResponse responseSimulado = new UsuarioResponse();
+        responseSimulado.setId(id);
+        responseSimulado.setNombre("Esteban Modificado");
+        responseSimulado.setCorreo("nuevo.correo@test.cl");
+
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(usuarioExistente));
+        when(usuarioRepository.existsByCorreo(updateRequest.getCorreo())).thenReturn(false);
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioGuardado);
+        when(usuarioMapper.toResponse(usuarioGuardado)).thenReturn(responseSimulado);
+
+        UsuarioResponse resultado = usuarioService.actualizarUsuario(id, updateRequest);
+
+        assertNotNull(resultado);
+        assertEquals("Esteban Modificado", resultado.getNombre());
+        assertEquals("nuevo.correo@test.cl", resultado.getCorreo());
+
+        
+        verify(usuarioRepository, times(1)).findById(id);
+        verify(usuarioRepository, times(1)).existsByCorreo(updateRequest.getCorreo());
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+        verify(usuarioMapper, times(1)).toResponse(usuarioGuardado);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar NoSuchElementException al intentar actualizar un usuario que no existe")
+    void debeLanzarExcepcionCuandoUsuarioNoExisteAlActualizar() {
+        Long id = 99L;
+        UsuarioUpdateRequest updateRequest = new UsuarioUpdateRequest();
+
+        when(usuarioRepository.findById(id)).thenReturn(Optional.empty());
+
+        NoSuchElementException excepcion = assertThrows(NoSuchElementException.class, () -> {
+            usuarioService.actualizarUsuario(id, updateRequest);
+        });
+
+        assertEquals("No existe el usuario " + id + " a actualizar", excepcion.getMessage());
+        verify(usuarioRepository, times(1)).findById(id);
+        verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("Debería lanzar IllegalArgumentException al actualizar si el nuevo correo ya pertenece a otro usuario")
+    void debeLanzarExcepcionCuandoNuevoCorreoYaExisteAlActualizar() {
+        Long id = 1L;
+        UsuarioUpdateRequest updateRequest = new UsuarioUpdateRequest();
+        updateRequest.setCorreo("correo.duplicado@test.cl");
+
+        Usuario usuarioExistente = new Usuario();
+        usuarioExistente.setId(id);
+        usuarioExistente.setCorreo("esteban.quinto@test.cl");
+
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(usuarioExistente));
+        when(usuarioRepository.existsByCorreo(updateRequest.getCorreo())).thenReturn(true);
+
+        IllegalArgumentException excepcion = assertThrows(IllegalArgumentException.class, () -> {
+            usuarioService.actualizarUsuario(id, updateRequest);
+        });
+
+        assertEquals("El nuevo correo electrónico ya se encuentra registrado en el sistema", excepcion.getMessage());
+        verify(usuarioRepository, times(1)).findById(id);
+        verify(usuarioRepository, times(1)).existsByCorreo(updateRequest.getCorreo());
+        verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("Debería eliminar el usuario correctamente si el ID existe en el sistema")
+    void debeEliminarUsuarioExitosamente() {
+        Long id = 1L;
+
+        when(usuarioRepository.existsById(id)).thenReturn(true);
+
+        usuarioService.eliminarUsuarioPorId(id);
+
+        verify(usuarioRepository, times(1)).existsById(id);
+        verify(usuarioRepository, times(1)).deleteById(id);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar NoSuchElementException al intentar eliminar un usuario que no existe")
+    void debeLanzarExcepcionCuandoUsuarioNoExisteAlEliminar() {
+        Long id = 99L;
+
+        when(usuarioRepository.existsById(id)).thenReturn(false);
+
+        NoSuchElementException excepcion = assertThrows(NoSuchElementException.class, () -> {
+            usuarioService.eliminarUsuarioPorId(id);
+        });
+
+        assertEquals("No se pudo encontrar al usuario con id: " + id + " para eliminar", excepcion.getMessage());
+        verify(usuarioRepository, times(1)).existsById(id);
+        verify(usuarioRepository, never()).deleteById(any(Long.class));
+    }
     
 }

@@ -71,7 +71,7 @@ public class UsuarioController {
                       "timestamp": "2026-06-21T17:00:00",
                       "status": 404,
                       "error": "Not Found",
-                      "message": "No se encontro el usuario con id: 999.",
+                      "message": "No se encontro el usuario con id: 999",
                       "path": "/v1/usuario/999",
                       "errors": []
                     }"""
@@ -143,7 +143,7 @@ public class UsuarioController {
                           "nombre": "Esteban",
                           "appaterno": "Quinto",
                           "apmaterno": "Gonzales",
-                          "correo": "patricio.soto@gmail.com",
+                          "correo": "e.quintogonzales.soto@gmail.com",
                           "direccion": "Avenida Siempre Viva 742",
                           "telefono": "+569912345678",
                           "tipoUsuario": "Vendedor"
