@@ -16,7 +16,8 @@ public class BusquedaMapper {
                 .envioId(request.getEnvioId())
                 .estadoEnvio(request.getEstadoEnvio())
                 .detalle(request.getDetalle())
-                .fechaActualizacionProducto(java.time.LocalDateTime.now())
+                .nombreProducto(request.getNombreProducto())
+                .fechaActualizacionProducto(request.getFechaActualizacionProducto())
                 .build();
     }
     public BusquedaResponse toResponse(Busqueda busqueda, String estadoNombre){
