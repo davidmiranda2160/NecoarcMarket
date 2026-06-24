@@ -25,7 +25,7 @@ public class ProductoClient {
         log.info("Llamando al microservicio de Productos para el ID: {}", id);
         try {
             return webClient.get()
-                    .uri("/{id}", id) 
+                    .uri("/v1/productos/{id}", id) 
                     .retrieve()
                     .bodyToMono(ProductoResponse.class)
                     .block();

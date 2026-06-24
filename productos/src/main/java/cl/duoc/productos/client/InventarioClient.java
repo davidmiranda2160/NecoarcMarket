@@ -19,7 +19,7 @@ public class InventarioClient {
         log.info("Llamando a Inventario para crear registro del producto: {}", request.getProductoId());
         try {
             return webClient.post()
-                    .uri("/abastecer") 
+                    .uri("/v1/inventario/abastecer") 
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(InventarioResponse.class)
@@ -32,7 +32,7 @@ public class InventarioClient {
     public InventarioResponse obtenerStockPorProducto(Long productoId) {
     try {
         return webClient.get()
-                .uri("/producto/{id}", productoId)
+                .uri("/v1/inventario/producto/{id}", productoId)
                 .retrieve()
                 .bodyToMono(InventarioResponse.class)
                 .block();

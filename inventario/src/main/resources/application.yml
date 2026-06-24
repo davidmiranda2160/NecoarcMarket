@@ -60,5 +60,4 @@ server:
 # Servicios Externos
 services:
   Productos:
-    # Si existe PRODUCTOS_SERVICE_URL (Railway) la usa, si no, busca el contenedor en Docker (http://productos-service:8081), si no, usa Laragon
-    baseUrl: ${PRODUCTOS_SERVICE_URL:http://${DB_HOST:localhost}:8081/v1/productos}
+    baseUrl: ${PRODUCTO_SERVICE_URL:http://productos-service:8081}

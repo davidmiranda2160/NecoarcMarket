@@ -70,4 +70,4 @@ server:
 
 services:
   usuario:
-    baseUrl: ${USUARIO_SERVICE_URL:http://${DB_HOST:localhost}:8080}
+    baseUrl: ${USUARIO_SERVICE_URL:http://usuario:8080}

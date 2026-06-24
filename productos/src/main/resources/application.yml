@@ -60,4 +60,4 @@ server:
 # Servicios Externos
 services:
   inventario:
-    baseUrl: ${INVENTARIO_SERVICE_URL:http://${DB_HOST:localhost}:8082/v1/inventario}
+    baseUrl: ${INVENTARIO_SERVICE_URL:http://inventario-service:8082}
