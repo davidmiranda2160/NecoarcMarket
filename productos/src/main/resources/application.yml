@@ -1,74 +1,63 @@
 spring:
-    application:
-        name: producto-service
+  application:
+    name: producto-service
+  profiles:
+    active: dev # 📍 Forzamos a que siempre use el perfil 'dev' si no le pasamos parámetros
 
-#Configuramos y activamos el perfil de dev para que se levante el DataLoader
-    profiles:
-        active: dev
-
-    mvc:
-        format:
-            date-time: iso
-
-#Configuracion de Swagger
-
+# Configuracion de Swagger
 springdoc:
-    api-docs:
-        enabled: true
-    swagger-ui:
-        enabled: true
-        path: /doc/swagger-ui.html
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /doc/swagger-ui.html
 
-#Configuracion de Logs
-
+# Configuracion de Logs
 logging:
   level:
     cl:
-        duoc:
-            productos: INFO
-        org:
-            hibernate:
-                SQL: DEBUG
+      duoc:
+        productos: INFO
+    org:
+      hibernate:
+        SQL: DEBUG
 
 ---
 
-#Configuracion del perfil Dev 
-
+# Configuracion del perfil Dev 
 spring:
-    config:
-        activate:
-            on-profile: dev
+  config:
+    activate:
+      on-profile: dev
 
-#Configuracion del JPA con hibernate
+  # Configuracion del JPA con hibernate e inyección dinámica
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:db_necoarcmarket_productos}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${DB_USER:root}
+    password: ${DB_PASS:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      initialization-fail-timeout: 5000  
+      connection-timeout: 5000
 
-    datasource:
-        url: jdbc:mysql://localhost:3306/db_necoarcmarket_productos?createDatabaseIfNotExist=true&serverTimezone=UTC
-        username: root
-        password: ""
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        hikari:
-            initialization-fail-timeout: 5000  # Si en 5 segundos Laragon no responde, el programa se apaga solo
-            connection-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
-    jpa:
-        hibernate:
-            ddl-auto: validate
-        show-sql: true
-        properties:
-            hibernate:
-                format_sql: true
+  # Configuracion para que Flyway funcione
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 
-#Configuracion para que Flyway funcione
-
-    flyway:
-        enabled: true
-        baseline-on-migrate: true
-
-
-#ubicacion de puertos
+# Ubicacion de puertos
 server:
-  port: 8081
+  port: ${PORT:8081}
 
+# Servicios Externos
 services:
   inventario:
-    baseUrl: http://localhost:8082/v1/inventario
+    baseUrl: ${INVENTARIO_SERVICE_URL:http://${DB_HOST:localhost}:8082/v1/inventario}
