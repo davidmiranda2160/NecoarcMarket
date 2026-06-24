@@ -37,16 +37,13 @@ public class ResenaServiceTest {
     @InjectMocks
     private ResenaService resenaService;
 
-    // =========================================================================
-    // TESTS PARA EL MÉTODO: crear()
-    // =========================================================================
 
     @Test
     @DisplayName("Debería crear una reseña exitosamente obteniendo el nombre completo del usuario")
     void debeCrearResenaExitosamente() {
-        // ------------------------------------------------------------------------
+
         // GIVEN
-        // ------------------------------------------------------------------------
+
         ResenaRequest request = new ResenaRequest();
         request.setProductoId(1L);
         request.setUsuarioId(10L);
@@ -68,14 +65,13 @@ public class ResenaServiceTest {
         when(usuarioClient.obtenerDatosUsuario(10L)).thenReturn(userMock);
         when(resenaMapper.toResponse(resenaGuardada, "Esteban Quinto")).thenReturn(responseMock);
 
-        // ------------------------------------------------------------------------
+
         // WHEN
-        // ------------------------------------------------------------------------
+
         ResenaResponse resultado = resenaService.crear(request);
 
-        // ------------------------------------------------------------------------
+
         // THEN
-        // ------------------------------------------------------------------------
         assertNotNull(resultado);
         assertEquals("Esteban Quinto", resultado.getNombreUsuario());
         verify(resenaRepository, times(1)).save(resenaMapeada);
@@ -85,9 +81,9 @@ public class ResenaServiceTest {
     @Test
     @DisplayName("Debería registrar la reseña como 'Servicio no disponible' si el micro de usuarios falla")
     void debeCrearResenaConFallbackCuandoUsuariosSeCae() {
-        // ------------------------------------------------------------------------
+
         // GIVEN
-        // ------------------------------------------------------------------------
+
         ResenaRequest request = new ResenaRequest();
         request.setProductoId(1L);
         request.setUsuarioId(10L);
@@ -103,32 +99,25 @@ public class ResenaServiceTest {
         when(resenaMapper.fromRequest(request)).thenReturn(resenaMapeada);
         when(resenaRepository.save(resenaMapeada)).thenReturn(resenaGuardada);
         
-        // Forzamos la caída de la API externa (dejamos vivo a David pero simulamos el error)
+
         when(usuarioClient.obtenerDatosUsuario(10L)).thenThrow(new RuntimeException("Timeout Connection"));
         when(resenaMapper.toResponse(resenaGuardada, "Servicio no disponible")).thenReturn(responseMock);
 
-        // ------------------------------------------------------------------------
         // WHEN
-        // ------------------------------------------------------------------------
+
         ResenaResponse resultado = resenaService.crear(request);
 
-        // ------------------------------------------------------------------------
         // THEN
-        // ------------------------------------------------------------------------
+
         assertNotNull(resultado);
         assertEquals("Servicio no disponible", resultado.getNombreUsuario());
     }
 
-    // =========================================================================
-    // TESTS PARA EL MÉTODO: listarPorProducto()
-    // =========================================================================
 
     @Test
     @DisplayName("Debería listar las reseñas de un producto y colocar 'Usuario Desconocido' si la API responde vacío")
     void debeListarResenasConUsuarioDesconocido() {
-        // ------------------------------------------------------------------------
-        // GIVEN
-        // ------------------------------------------------------------------------
+
         Long prodId = 1L;
         Resena r1 = Resena.builder().id(100L).productoId(prodId).usuarioId(20L).build();
         
@@ -143,14 +132,14 @@ public class ResenaServiceTest {
                 
         when(resenaMapper.toResponse(r1, "Usuario Desconocido")).thenReturn(responseMock);
 
-        // ------------------------------------------------------------------------
+
         // WHEN
-        // ------------------------------------------------------------------------
+
         List<ResenaResponse> resultado = resenaService.listarPorProducto(prodId);
 
-        // ------------------------------------------------------------------------
+
         // THEN
-        // ------------------------------------------------------------------------
+
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
         assertEquals("Usuario Desconocido", resultado.get(0).getNombreUsuario());

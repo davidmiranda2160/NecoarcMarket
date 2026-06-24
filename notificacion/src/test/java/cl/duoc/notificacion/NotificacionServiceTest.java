@@ -38,16 +38,14 @@ public class NotificacionServiceTest {
     @InjectMocks
     private NotificacionService notificacionService;
 
-    // =========================================================================
-    // TESTS PARA EL MÉTODO: listarPorUsuario()
-    // =========================================================================
+
 
     @Test
     @DisplayName("Debería retornar el historial de notificaciones mapeado con el nombre completo del usuario")
     void debeListarPorUsuarioExitosamente() {
-        // ------------------------------------------------------------------------
+
         // GIVEN
-        // ------------------------------------------------------------------------
+
         Long userId = 1L;
         UsuarioResponse userMock = new UsuarioResponse();
         userMock.setNombre("Esteban");
@@ -65,14 +63,13 @@ public class NotificacionServiceTest {
         when(notificacionRepository.findByUsuarioIdOrderByFechaEnvioDesc(userId)).thenReturn(List.of(n1));
         when(notificacionMapper.toResponse(n1, "Esteban Quinto")).thenReturn(responseMock);
 
-        // ------------------------------------------------------------------------
         // WHEN
-        // ------------------------------------------------------------------------
+
         List<NotificacionResponse> resultado = notificacionService.listarPorUsuario(userId);
 
-        // ------------------------------------------------------------------------
+
         // THEN
-        // ------------------------------------------------------------------------
+
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
         assertEquals("Esteban Quinto", resultado.get(0).getNombreUsuario());
@@ -82,9 +79,9 @@ public class NotificacionServiceTest {
     @Test
     @DisplayName("Debería listar notificaciones como 'Usuario Desconocido' si el cliente de usuarios responde nulo")
     void debeListarComoUsuarioDesconocidoCuandoClienteFalla() {
-        // ------------------------------------------------------------------------
+
         // GIVEN
-        // ------------------------------------------------------------------------
+
         Long userId = 99L;
         Notificacion n1 = new Notificacion();
 
@@ -96,28 +93,24 @@ public class NotificacionServiceTest {
         
         when(notificacionMapper.toResponse(n1, "Usuario Desconocido")).thenReturn(responseMock);
 
-        // ------------------------------------------------------------------------
         // WHEN
-        // ------------------------------------------------------------------------
+
         List<NotificacionResponse> resultado = notificacionService.listarPorUsuario(userId);
 
-        // ------------------------------------------------------------------------
+
         // THEN
-        // ------------------------------------------------------------------------
+
         assertNotNull(resultado);
         assertEquals("Usuario Desconocido", resultado.get(0).getNombreUsuario());
     }
 
-    // =========================================================================
-    // TESTS PARA EL MÉTODO: crear()
-    // =========================================================================
 
     @Test
     @DisplayName("Debería crear una notificación personalizada con un saludo cuando el usuario existe")
     void debeCrearNotificacionConUsuarioExistente() {
-        // ------------------------------------------------------------------------
+
         // GIVEN
-        // ------------------------------------------------------------------------
+    
         NotificacionRequest request = new NotificacionRequest();
         request.setUsuarioId(1L);
         request.setTipo("ALERTA");
@@ -125,21 +118,18 @@ public class NotificacionServiceTest {
 
         UsuarioResponse userMock = new UsuarioResponse();
         userMock.setNombre("Esteban");
-        userMock.setApmaperno("Quinto"); // Calza con tu getApmaperno()
+        userMock.setApmaperno("Quinto"); 
 
         when(usuarioClient.obtenerDatosUsuario(1L)).thenReturn(userMock);
 
-        // Usamos un capturador para atrapar el objeto que se envía a guardar
+
         ArgumentCaptor<Notificacion> notificacionCaptor = ArgumentCaptor.forClass(Notificacion.class);
 
-        // ------------------------------------------------------------------------
+
         // WHEN
-        // ------------------------------------------------------------------------
         notificacionService.crear(request);
 
-        // ------------------------------------------------------------------------
         // THEN
-        // ------------------------------------------------------------------------
         verify(notificacionRepository, times(1)).save(notificacionCaptor.capture());
         Notificacion notificacionGuardada = notificacionCaptor.getValue();
 
@@ -151,9 +141,9 @@ public class NotificacionServiceTest {
     @Test
     @DisplayName("Debería crear una notificación con mensaje genérico de aviso si el usuario es nulo")
     void debeCrearNotificacionConMensajeGenericoSiUsuarioEsNulo() {
-        // ------------------------------------------------------------------------
+
         // GIVEN
-        // ------------------------------------------------------------------------
+
         NotificacionRequest request = new NotificacionRequest();
         request.setUsuarioId(99L);
         request.setTipo("SMS");
@@ -162,14 +152,12 @@ public class NotificacionServiceTest {
         when(usuarioClient.obtenerDatosUsuario(99L)).thenReturn(null);
         ArgumentCaptor<Notificacion> notificacionCaptor = ArgumentCaptor.forClass(Notificacion.class);
 
-        // ------------------------------------------------------------------------
         // WHEN
-        // ------------------------------------------------------------------------
+
         notificacionService.crear(request);
 
-        // ------------------------------------------------------------------------
         // THEN
-        // ------------------------------------------------------------------------
+
         verify(notificacionRepository, times(1)).save(notificacionCaptor.capture());
         Notificacion notificacionGuardada = notificacionCaptor.getValue();
 

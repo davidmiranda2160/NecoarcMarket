@@ -39,9 +39,7 @@ public class InventarioServiceTest {
     @InjectMocks
     private InventarioService inventarioService;
 
-    // =========================================================================
-    // 1. TESTS PARA obtenerStockPorProducto()
-    // =========================================================================
+
 
     @Test
     @DisplayName("Debería retornar el stock de un producto si tiene registro en la base de datos")
@@ -76,9 +74,7 @@ public class InventarioServiceTest {
         });
     }
 
-    // =========================================================================
-    // 2. TESTS PARA agregarStock()
-    // =========================================================================
+
 
     @Test
     @DisplayName("Debería validar la existencia en la API externa y acumular el nuevo stock")
@@ -103,9 +99,7 @@ public class InventarioServiceTest {
         verify(inventarioRepository, times(1)).save(any(Inventario.class));
     }
 
-    // =========================================================================
-    // 3. TESTS PARA descontarStock()
-    // =========================================================================
+
 
     @Test
     @DisplayName("Debería restar el stock correctamente cuando hay unidades suficientes")
@@ -145,9 +139,7 @@ public class InventarioServiceTest {
         verify(inventarioRepository, never()).save(any(Inventario.class));
     }
 
-    // =========================================================================
-    // 4. TESTS PARA tieneStockSuficiente()
-    // =========================================================================
+
 
     @Test
     @DisplayName("Debería retornar verdadero si el stock actual cubre o iguala la cantidad requerida")
@@ -166,9 +158,6 @@ public class InventarioServiceTest {
         assertFalse(conExcedido);
     }
 
-    // =========================================================================
-    // 5. TESTS PARA obtenerDetalleCompleto()
-    // =========================================================================
 
     @Test
     @DisplayName("Debería cruzar los datos locales con la API externa para armar el DTO de detalle completo")
@@ -191,9 +180,6 @@ public class InventarioServiceTest {
         verify(productoClient, times(1)).obtenerProductoPorId(prodId);
     }
 
-    // =========================================================================
-    // 6. TESTS PARA eliminarInventarioPorProducto()
-    // =========================================================================
 
     @Test
     @DisplayName("Debería eliminar físicamente el registro de la base de datos si el ID existe")
