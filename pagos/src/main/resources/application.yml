@@ -1,15 +1,15 @@
 spring:
   application:
     name: pagos-service
-  
-  # Configuración de Base de Datos
+
+# Configuración de Base de Datos
   datasource:
     url: jdbc:mysql://localhost:3306/db_necoarcmarket_pagos?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: root
-    password:     # En Laragon por defecto la contraseña es vacía
+    password:      # En Laragon por defecto la contraseña es vacía
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  # Configuración del JPA
+# Configuración del JPA
   jpa:
     hibernate:
       ddl-auto: validate
@@ -18,7 +18,7 @@ spring:
       hibernate:
         format_sql: true
 
-  # Configuración de Flyway
+# Configuración de Flyway
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -39,3 +39,22 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /doc/swagger-ui.html
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev, prod
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST:mysql}:${DB_PORT:3306}/${DB_NAME:db_necoarcmarket_pagos}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${DB_USER:root}
+    password: ${DB_PASS:}
+
+server:
+  port: ${PORT:8092}
+
+services:
+  ordenes:
+    baseUrl: ${ORDENES_SERVICE_URL:http://${DB_HOST:localhost}:8088}

@@ -3,7 +3,7 @@ CREATE TABLE envios (
     orden_id BIGINT NOT NULL,
     usuario_id BIGINT NOT NULL,
     direccion_destino VARCHAR(255) NOT NULL,
-    numero_seguimiento VARCHAR(50) NOT NULL,
+    codigo_seguimiento VARCHAR(50) NOT NULL,
     estado_envio VARCHAR(30) NOT NULL,
     empresa_transporte VARCHAR(50) NOT NULL,
     fecha_estimada_entrega DATE NOT NULL,

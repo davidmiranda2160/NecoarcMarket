@@ -1,8 +1,6 @@
 spring:
     application:
         name: busqueda-service
-
-#Configuramos y activamos el perfil de dev para que se levante el DataLoader
     profiles:
         active: dev
 
@@ -26,9 +24,9 @@ logging:
     cl:
         duoc:
             busqueda: INFO
-        org:
-            hibernate:
-                SQL: DEBUG
+    org:
+        hibernate:
+            SQL: DEBUG
 
 ---
 
@@ -37,14 +35,14 @@ logging:
 spring:
     config:
         activate:
-            on-profile: dev
+            on-profile: dev, prod
 
 #Configuracion del JPA con hibernate
 
     datasource:
-        url: jdbc:mysql://localhost:3306/db_necoarcmarket_busqueda?createDatabaseIfNotExist=true&serverTimezone=UTC
-        username: root
-        password: ""
+        url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:db_necoarcmarket_busqueda}?createDatabaseIfNotExist=true&serverTimezone=UTC
+        username: ${DB_USER:root}
+        password: ${DB_PASS:}
         driver-class-name: com.mysql.cj.jdbc.Driver
         hikari:
             initialization-fail-timeout: 5000  # Si en 5 segundos Laragon no responde, el programa se apaga solo
@@ -64,13 +62,12 @@ spring:
         enabled: true
         baseline-on-migrate: true
 
-
 #ubicacion de puertos
 server:
-  port: 8081
+  port: ${PORT:8081}
 
 services:
   envios:
-    baseUrl: http://localhost:8083
+    baseUrl: ${ENVIOS_SERVICE_URL:http://${DB_HOST:localhost}:8083}
   productos:
-    url: http://localhost:8081/v1/productos
+    baseUrl: ${PRODUCTOS_SERVICE_URL:http://${DB_HOST:localhost}:8081/v1/productos}

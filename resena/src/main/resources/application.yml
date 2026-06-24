@@ -26,9 +26,9 @@ logging:
     cl:
         duoc:
             resena: INFO
-        org:
-            hibernate:
-                SQL: DEBUG
+    org:
+        hibernate:
+            SQL: DEBUG
 
 ---
 
@@ -37,14 +37,14 @@ logging:
 spring:
     config:
         activate:
-            on-profile: dev
+            on-profile: dev, prod
 
 #Configuracion del JPA con hibernate
 
     datasource:
-        url: jdbc:mysql://localhost:3306/db_necoarcmarket_resena?createDatabaseIfNotExist=true&serverTimezone=UTC
-        username: root
-        password: ""
+        url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:db_necoarcmarket_resena}?createDatabaseIfNotExist=true&serverTimezone=UTC
+        username: ${DB_USER:root}
+        password: ${DB_PASS:}
         driver-class-name: com.mysql.cj.jdbc.Driver
         hikari:
             initialization-fail-timeout: 5000  # Si en 5 segundos Laragon no responde, el programa se apaga solo
@@ -64,11 +64,10 @@ spring:
         enabled: true
         baseline-on-migrate: true
 
-
 #ubicacion de puertos
 server:
-  port: 8086
+  port: ${PORT:8086}
 
 services:
   usuario:
-    baseUrl: http://localhost:8080
+    baseUrl: ${USUARIO_SERVICE_URL:http://${DB_HOST:localhost}:8080}

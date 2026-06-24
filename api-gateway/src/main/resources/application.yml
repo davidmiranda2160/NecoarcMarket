@@ -1,9 +1,19 @@
 server:
-  port: 8090
+  port: ${PORT:8090}
 
 spring:
   application:
     name: api-gateway
+  profiles:
+    active: dev
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev, prod
+
   cloud:
     gateway:
       server:
@@ -11,7 +21,7 @@ spring:
           routes:
             #Microservicio de Usuarios
             - id: ms-usuario-route
-              uri: http://localhost:8080
+              uri: ${USUARIO_SERVICE_URL:http://localhost:8080}
               predicates:
                 - Path=/v1/usuario/**
               filters:
@@ -19,7 +29,7 @@ spring:
 
             #Microservicio de Productos
             - id: ms-productos-route
-              uri: http://localhost:8081
+              uri: ${PRODUCTOS_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/v1/productos/**
               filters:
@@ -27,7 +37,7 @@ spring:
 
             #Microservicio de Inventario 
             - id: ms-inventario-route
-              uri: http://localhost:8082
+              uri: ${INVENTARIO_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/v1/inventario/**
               filters:
@@ -35,7 +45,7 @@ spring:
 
             #Microservicio de Búsqueda
             - id: ms-busqueda-route
-              uri: http://localhost:8083
+              uri: ${BUSQUEDA_SERVICE_URL:http://localhost:8083}
               predicates:
                 - Path=/v1/busqueda/**
               filters:
@@ -43,7 +53,7 @@ spring:
 
             #Microservicio de Envío
             - id: ms-envio-route
-              uri: http://localhost:8084
+              uri: ${ENVIO_SERVICE_URL:http://localhost:8084}
               predicates:
                 - Path=/v1/envio/**
               filters:
@@ -51,7 +61,7 @@ spring:
 
             #Microservicio de Notificaciones
             - id: ms-notificacion-route
-              uri: http://localhost:8085
+              uri: ${NOTIFICACION_SERVICE_URL:http://localhost:8085}
               predicates:
                 - Path=/v1/notificacion/**
               filters:
@@ -59,7 +69,7 @@ spring:
 
             #Microservicio de Reseñas
             - id: ms-resena-route
-              uri: http://localhost:8086
+              uri: ${RESENA_SERVICE_URL:http://localhost:8086}
               predicates:
                 - Path=/v1/resena/**
               filters:
@@ -67,7 +77,7 @@ spring:
 
             #Microservicio de Carrito
             - id: ms-carrito-route
-              uri: http://localhost:8087
+              uri: ${CARRITO_SERVICE_URL:http://localhost:8087}
               predicates:
                 - Path=/v1/carrito/**
               filters:
@@ -75,7 +85,7 @@ spring:
 
             #Microservicio de Órdenes
             - id: ms-ordenes-route
-              uri: http://localhost:8088
+              uri: ${ORDENES_SERVICE_URL:http://localhost:8088}
               predicates:
                 - Path=/v1/ordenes/**
               filters:
@@ -83,7 +93,7 @@ spring:
 
             #Microservicio de Pagos
             - id: ms-pagos-route
-              uri: http://localhost:8092
+              uri: ${PAGOS_SERVICE_URL:http://localhost:8092}
               predicates:
                 - Path=/v1/pagos/**
               filters:
