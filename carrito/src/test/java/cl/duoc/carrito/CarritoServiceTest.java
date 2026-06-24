@@ -8,6 +8,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,6 +50,7 @@ public class CarritoServiceTest {
     private CarritoService carritoService;
 
     @Test
+    @DisplayName("Agregar Producto - Cuando es nuevo deberia calcular monto y guardar")
     void agregarProducto_CuandoEsNuevo_DeberiaCalcularYGuardar() {
 
         Long idUsuario = 5L;
@@ -107,6 +109,7 @@ public class CarritoServiceTest {
     }
 
     @Test
+    @DisplayName("Agregar Producto - Cuando ya existe deberia acumular cantidad y monto")
     void agregarProducto_CuandoYaExiste_DeberiaAcumularCantidadYMonto() {
 
         Long idUsuario = 5L;
@@ -159,6 +162,7 @@ public class CarritoServiceTest {
     }
 
     @Test
+    @DisplayName("Obtener Carrito - Cuando tiene productos deberia retornar la lista")
     void obtenerCarritoPorUsuario_CuandoTieneProductos_DeberiaRetornarLista() {
     
         Long idUsuario = 5L;
@@ -235,6 +239,7 @@ public class CarritoServiceTest {
     }
 
     @Test
+    @DisplayName("Agregar Producto - Cuando cantidad es cero o menor deberia lanzar IllegalArgumentException")
     void obtenerCarritoPorUsuario_CuandoCarritoEstaVacio_DeberiaLanzarNoSuchElementException() {
         
         Long idUsuario = 5L;
@@ -258,6 +263,7 @@ public class CarritoServiceTest {
     }
 
     @Test
+    @DisplayName("Obtener Carrito - Cuando esta vacio deberia lanzar NoSuchElementException")
     void actualizarCantidad_CuandoItemNoExiste_DeberiaLanzarNoSuchElementException() {
         
         Long idCarritoInvalido = 6L;
