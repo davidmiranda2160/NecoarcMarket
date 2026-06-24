@@ -2,7 +2,7 @@ spring:
   application:
     name: inventario-service
   profiles:
-    active: dev # 📍 Forzamos a que use el perfil 'dev' por defecto en cualquier entorno
+    active: dev
 
 # Configuracion de Swagger
 springdoc:
@@ -28,7 +28,7 @@ logging:
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: dev, prod
 
   # Configuracion del JPA con hibernate adaptable de forma dinámica
   datasource:

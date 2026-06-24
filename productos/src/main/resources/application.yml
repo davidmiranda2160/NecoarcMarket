@@ -2,7 +2,7 @@ spring:
   application:
     name: producto-service
   profiles:
-    active: dev # 📍 Forzamos a que siempre use el perfil 'dev' si no le pasamos parámetros
+    active: dev # Si lo corres en Laragon/IDE, usará dev por defecto
 
 # Configuracion de Swagger
 springdoc:
@@ -24,11 +24,11 @@ logging:
 
 ---
 
-# Configuracion del perfil Dev 
+# 📍 El truco infalible: Esta sección ahora se activará tanto en DEV como en PROD
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: dev, prod 
 
   # Configuracion del JPA con hibernate e inyección dinámica
   datasource:
