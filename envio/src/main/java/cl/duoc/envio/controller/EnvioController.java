@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequestMapping("v1/envio")
-@Tag(name = "Envios", description = "Gestión de despachos y seguimiento de órdenes")
+@Tag(name = "Envios", description = "Gestión de despachos y seguimiento de ordenes")
 @RequiredArgsConstructor
 public class EnvioController {
 

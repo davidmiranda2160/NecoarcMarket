@@ -22,8 +22,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI(){
         return new OpenAPI() //Se crea la instancia de OpenAPI
                 .info(new Info() //Se define la informacio de la documentacion
-                    .title("API de ")
+                    .title("NecoArc Market - Servicio de Envios API")
                     .version("2.0")
-                    .description("Documentación de la API encargada de gestionar el ciclo de vida de los envíos."));
+                    .description("Documentación de los endpoints para la gestión, seguimiento y actualización de los envíos del sistema."));
     }
 }

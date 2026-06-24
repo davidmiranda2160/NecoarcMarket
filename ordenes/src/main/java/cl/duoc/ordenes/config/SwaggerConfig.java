@@ -23,8 +23,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI(){
         return new OpenAPI() //Se crea la instancia de OpenAPI
                 .info(new Info() //Se define la informacio de la documentacion
-                    .title("API para gestionar ordenes del sistema Necoarcmarkert")
+                    .title("NecoArc Market - Servicio de Ordenes API")
                     .version("2.0")
-                    .description("Documentacion de la API para el sistema Necoarcmarket"));
+                    .description("Documentación de los endpoints para la creacion, consulta y gestion de las ordenes de compra del sistema."));
     }
 }
