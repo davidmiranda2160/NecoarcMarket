@@ -1,4 +1,4 @@
-package cl.duoc.carrito.config;
+package cl.duoc.envio.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +22,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI(){
         return new OpenAPI() //Se crea la instancia de OpenAPI
                 .info(new Info() //Se define la informacio de la documentacion
-                    .title("API de gestion para carrito del del sistema Necoarcmarket")
+                    .title("API de ")
                     .version("2.0")
-                    .description("Documentacion de la API para el sistema Necoarcmarket"));
+                    .description("Documentación de la API encargada de gestionar el ciclo de vida de los envíos."));
     }
 }
