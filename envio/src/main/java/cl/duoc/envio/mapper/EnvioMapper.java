@@ -16,6 +16,7 @@ public class EnvioMapper {
     }
 
         return Envio.builder()
+                .usuarioId(request.getUsuarioId())
                 .empresaTransporte(request.getEmpresaTransporte())
                 .direccionDestino(request.getDireccionDestino())
                 .build();
@@ -32,6 +33,7 @@ public class EnvioMapper {
                 .estadoEnvio(envio.getEstadoEnvio())
                 .empresaTransporte(envio.getEmpresaTransporte())
                 .fechaEstimadaEntrega(envio.getFechaEstimadaEntrega())
+                .fechaCreacion(envio.getFechaCreacion())
                 .direccionDestino(envio.getDireccionDestino())
                 .orden(ordenResponse)
                 .build();

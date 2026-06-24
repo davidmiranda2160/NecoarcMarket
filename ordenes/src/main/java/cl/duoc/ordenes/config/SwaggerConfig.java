@@ -1,10 +1,11 @@
-package cl.duoc.carrito.config;
+package cl.duoc.ordenes.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+
 
 /*
 Esta clase sirve para personalizar la informacion que aparece en la
@@ -22,8 +23,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI(){
         return new OpenAPI() //Se crea la instancia de OpenAPI
                 .info(new Info() //Se define la informacio de la documentacion
-                    .title("NecoArcMarket - Servicio de Carrito API")
+                    .title("NecoArc Market - Servicio de Ordenes API")
                     .version("2.0")
-                    .description("Documentación detallada de los endpoints para la gestión del carrito de compras."));
+                    .description("Documentación de los endpoints para la creacion, consulta y gestion de las ordenes de compra del sistema."));
     }
 }

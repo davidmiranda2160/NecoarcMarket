@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/v1/usuario")
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name= "Usuario", description= "Operaciones relacionadas con el microservicio de usuario")
+@Tag(name= "Usuario", description= "Gestion de perfiles para usuarios del sistema")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;

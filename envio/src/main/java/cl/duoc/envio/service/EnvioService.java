@@ -32,6 +32,11 @@ public class EnvioService {
     public EnvioResponse crearEnvio(EnvioRequest request) {
     Long ordenId = request.getOrdenId();
     
+    if (envioRepository.existsByOrdenId(ordenId)) {
+        log.warn("Intento de crear envio duplicado para la orden con id: {}", ordenId);
+        throw new IllegalStateException("Ya existe un envío registrado para la orden: " + ordenId);
+    }
+    
     OrdenesResponse orden = ordenesClient.buscarOrdenPorId(ordenId);
     if (orden == null) {
         log.warn("No se pudo crear el envio: la orden con id {} no existe en el sistema", ordenId);
@@ -42,7 +47,7 @@ public class EnvioService {
     
     envio.setOrdenId(ordenId);
     envio.setUsuarioId(request.getUsuarioId());
-    envio.setEstadoEnvio("Pendiente"); 
+    envio.setEstadoEnvio("Preparando"); 
     
     String codigoSeguimiento = String.format("TRACK-NECO-%03d", ordenId);
     envio.setCodigoSeguimiento(codigoSeguimiento); 
