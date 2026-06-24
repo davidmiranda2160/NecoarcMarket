@@ -3,15 +3,28 @@ spring:
     name: carrito-service
   profiles:
     active: dev
-  
-# Configuración de Base de Datos
+
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /doc/swagger-ui.html
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
   datasource:
     url: jdbc:mysql://localhost:3306/db_necoarcmarket_carrito?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: root
-    password:     # En Laragon por defecto la contraseña es vacía
+    password: "" # Vacío para Laragon
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-# Configuración del JPA
   jpa:
     hibernate:
       ddl-auto: validate
@@ -20,47 +33,46 @@ spring:
       hibernate:
         format_sql: true
 
-# Configuración de Flyway
   flyway:
     enabled: true
     baseline-on-migrate: true
 
-# Puerto del microservicio
 server:
   port: 8087
 
-# URL para que otros lo encuentren (Microservicios)
 service:
   usuario:
     baseUrl: http://localhost:8080
   producto:
     baseUrl: http://localhost:8081
 
-# Configuración para que funcione swagger
-springdoc:
-  api-docs:
-    enabled: true
-  swagger-ui:
-    enabled: true
-    path: /doc/swagger-ui.html
 
 ---
-
 spring:
   config:
     activate:
-      on-profile: dev, prod
+      on-profile: prod
 
   datasource:
     url: jdbc:mysql://${DB_HOST:mysql}:${DB_PORT:3306}/${DB_NAME:db_necoarcmarket_carrito}?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: ${DB_USER:root}
     password: ${DB_PASS:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 
 server:
   port: ${PORT:8087}
 
 service:
   usuario:
-    baseUrl: ${USUARIO_SERVICE_URL:http://${DB_HOST:localhost}:8080}
+    baseUrl: ${USUARIO_SERVICE_URL:http://usuario:8080}
   producto:
-    baseUrl: ${PRODUCTO_SERVICE_URL:http://${DB_HOST:localhost}:8081}
+    baseUrl: ${PRODUCTO_SERVICE_URL:http://productos:8081}
