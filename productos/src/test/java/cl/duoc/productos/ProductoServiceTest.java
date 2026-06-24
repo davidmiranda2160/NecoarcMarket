@@ -46,9 +46,7 @@ public class ProductoServiceTest {
     @Test
     @DisplayName("Debería crear un producto exitosamente e inicializar su inventario en 0")
     void debeCrearProductoExitosamente() {
-        // ------------------------------------------------------------------------
-        // GIVEN: Preparación del escenario ficticio
-        // ------------------------------------------------------------------------
+        // GIVEN
         ProductoRequest request = new ProductoRequest();
         request.setNombrep("Peluche de Neco-Arc");
         request.setPrecio(new BigDecimal("25.99"));
@@ -68,52 +66,42 @@ public class ProductoServiceTest {
         responseSimulado.setNombrep("Peluche de Neco-Arc");
         responseSimulado.setStock(0);
 
-        // Definimos comportamientos de los mocks
+   
         when(productoRepository.existsByNombrep(request.getNombrep())).thenReturn(false);
         when(productoMapper.fromRequest(request)).thenReturn(productoMapeado);
         when(productoRepository.save(productoMapeado)).thenReturn(productoGuardado);
         when(productoMapper.toResponse(productoGuardado, 0)).thenReturn(responseSimulado);
 
-        // ------------------------------------------------------------------------
-        // WHEN: Ejecución de la acción
-        // ------------------------------------------------------------------------
+        // WHEN
         ProductoResponse resultado = productoService.crearProducto(request);
 
-        // ------------------------------------------------------------------------
         // THEN: Verificaciones y Aserciones precisas
-        // ------------------------------------------------------------------------
         assertNotNull(resultado, "La respuesta no debería ser nula");
         assertEquals(1L, resultado.getId());
         assertEquals("Peluche de Neco-Arc", resultado.getNombrep());
         assertEquals(0, resultado.getStock());
 
-        // Verificamos que se llamó al repositorio e inventario una sola vez
         verify(productoRepository, times(1)).existsByNombrep(request.getNombrep());
         verify(productoRepository, times(1)).save(productoMapeado);
         verify(inventarioClient, times(1)).crearRegistroInventario(any());
     }
 
     @Test
-    @DisplayName("Debería lanzar ConflictException cuando se intenta registrar un nombre que ya existe")
+    @DisplayName("Debería lanzar un warn cuando se intenta registrar un nombre que ya existe")
     void debeLanzarExcepcionCuandoNombreYaExiste() {
-        // ------------------------------------------------------------------------
         // GIVEN
-        // ------------------------------------------------------------------------
         ProductoRequest request = new ProductoRequest();
         request.setNombrep("Peluche de Neco-Arc");
 
         when(productoRepository.existsByNombrep(request.getNombrep())).thenReturn(true);
 
-        // ------------------------------------------------------------------------
-        // WHEN & THEN
-        // ------------------------------------------------------------------------
+        // WHEN y THEN
         ConflictException excepcion = assertThrows(ConflictException.class, () -> {
             productoService.crearProducto(request);
         });
 
         assertEquals("El nombre del producto ya existe", excepcion.getMessage());
         
-        // Verificamos que jamás pasó por la etapa de guardado ni mapeo
         verify(productoRepository, never()).save(any(Producto.class));
         verify(inventarioClient, never()).crearRegistroInventario(any());
     }
@@ -121,9 +109,7 @@ public class ProductoServiceTest {
     @Test
     @DisplayName("Debería retornar el producto con stock 0 si el microservicio de inventario está caído")
     void debeRetornarProductoConStockCeroSiInventarioFalla() {
-        // ------------------------------------------------------------------------
         // GIVEN
-        // ------------------------------------------------------------------------
         Long idBuscado = 1L;
         Producto productoMock = new Producto();
         productoMock.setId(idBuscado);
@@ -136,20 +122,16 @@ public class ProductoServiceTest {
 
         when(productoRepository.findById(idBuscado)).thenReturn(Optional.of(productoMock));
         
-        // Simulamos un error de conexión lanzando una excepción al llamar al micro de inventario
+        
         when(inventarioClient.obtenerStockPorProducto(idBuscado))
             .thenThrow(new RuntimeException("Conexión rechazada por el servidor"));
 
         when(productoMapper.toResponse(productoMock, 0)).thenReturn(responseMock);
 
-        // ------------------------------------------------------------------------
         // WHEN
-        // ------------------------------------------------------------------------
         ProductoResponse resultado = productoService.buscarProductoPorId(idBuscado);
 
-        // ------------------------------------------------------------------------
         // THEN
-        // ------------------------------------------------------------------------
         assertNotNull(resultado);
         assertEquals(0, resultado.getStock(), "El stock debería ser 0 debido a la caída controlada del servicio");
         verify(productoRepository, times(1)).findById(idBuscado);
@@ -159,15 +141,11 @@ public class ProductoServiceTest {
     @Test
     @DisplayName("Debería lanzar NoSuchElementException cuando se busca un producto inexistente")
     void debeLanzarExcepcionCuandoProductoNoExiste() {
-        // ------------------------------------------------------------------------
         // GIVEN
-        // ------------------------------------------------------------------------
         Long idInexistente = 99L;
         when(productoRepository.findById(idInexistente)).thenReturn(Optional.empty());
 
-        // ------------------------------------------------------------------------
         // WHEN & THEN
-        // ------------------------------------------------------------------------
         NoSuchElementException excepcion = assertThrows(NoSuchElementException.class, () -> {
             productoService.buscarProductoPorId(idInexistente);
         });
@@ -179,9 +157,7 @@ public class ProductoServiceTest {
     @Test
     @DisplayName("Debería retornar la lista completa de productos mapeados con sus stocks correspondientes")
     void debeBuscarProductosExitosamente() {
-        // ------------------------------------------------------------------------
         // GIVEN
-        // ------------------------------------------------------------------------
         Producto p1 = Producto.builder().id(1L).nombrep("Peluche Neco-Arc").precio(new BigDecimal("10")).build();
         Producto p2 = Producto.builder().id(2L).nombrep("Polera Neco-Arc").precio(new BigDecimal("15")).build();
         
@@ -195,14 +171,10 @@ public class ProductoServiceTest {
         when(productoMapper.toResponse(p1, 5)).thenReturn(r1);
         when(productoMapper.toResponse(p2, 12)).thenReturn(r2);
 
-        // ------------------------------------------------------------------------
         // WHEN
-        // ------------------------------------------------------------------------
         List<ProductoResponse> resultado = productoService.buscarProductos();
 
-        // ------------------------------------------------------------------------
         // THEN
-        // ------------------------------------------------------------------------
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
         assertEquals(5, resultado.get(0).getStock());
@@ -212,9 +184,7 @@ public class ProductoServiceTest {
     @Test
     @DisplayName("Debería actualizar los campos del producto de forma dinámica y retornar el DTO modificado")
     void debeActualizarProductoExitosamente() {
-        // ------------------------------------------------------------------------
         // GIVEN
-        // ------------------------------------------------------------------------
         Long idProd = 1L;
         ProductoUpdateRequest updateReq = new ProductoUpdateRequest();
         updateReq.setNombrep("Peluche Nuevo");
@@ -230,14 +200,10 @@ public class ProductoServiceTest {
         when(inventarioClient.obtenerStockPorProducto(idProd)).thenReturn(InventarioResponse.builder().cantidad(10).build());
         when(productoMapper.toResponse(productoModificado, 10)).thenReturn(responseMock);
 
-        // ------------------------------------------------------------------------
         // WHEN
-        // ------------------------------------------------------------------------
         ProductoResponse resultado = productoService.actualizarProducto(idProd, updateReq);
 
-        // ------------------------------------------------------------------------
         // THEN
-        // ------------------------------------------------------------------------
         assertNotNull(resultado);
         assertEquals("Peluche Nuevo", resultado.getNombrep());
         assertEquals(10, resultado.getStock());
@@ -247,21 +213,16 @@ public class ProductoServiceTest {
     @Test
     @DisplayName("Debería eliminar el producto correctamente cuando el ID existe")
     void debeEliminarProductoExitosamente() {
-        // ------------------------------------------------------------------------
         // GIVEN
-        // ------------------------------------------------------------------------
         Long idEliminar = 1L;
         when(productoRepository.existsById(idEliminar)).thenReturn(true);
         doNothing().when(productoRepository).deleteById(idEliminar);
 
-        // ------------------------------------------------------------------------
         // WHEN
-        // ------------------------------------------------------------------------
         productoService.eliminarProducto(idEliminar);
 
-        // ------------------------------------------------------------------------
         // THEN
-        // ------------------------------------------------------------------------
+  
         verify(productoRepository, times(1)).existsById(idEliminar);
         verify(productoRepository, times(1)).deleteById(idEliminar);
     }
