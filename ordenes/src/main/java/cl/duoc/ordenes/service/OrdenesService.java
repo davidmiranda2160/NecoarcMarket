@@ -137,18 +137,18 @@ public class OrdenesService {
                 .collect(Collectors.toList());
     }
     public void actualizarEstadoDesdePagos(Long idOrden, String nuevoEstado) {
-        log.info("Cambiando estado de orden ID {} a: {}", idOrden, nuevoEstado);
+        log.info("Cambiando estado de orden con id {} a: {}", idOrden, nuevoEstado);
 
         Ordenes orden = ordenesRepository.findById(idOrden)
-                .orElseThrow(() -> new NoSuchElementException("No existe la orden con ID: " + idOrden));
+                .orElseThrow(() -> new NoSuchElementException("No existe la orden con id: " + idOrden));
 
         if ("Cancelada".equalsIgnoreCase(nuevoEstado)) {
-            log.warn("La orden ID {} fue rechazada en pagos. Iniciando proceso de devolución de stock...", idOrden);
+            log.warn("La orden con id {} fue rechazada en pagos, se inicira el proceso de devolución de stock...", idOrden);
 
             List<OrdenesDetalle> detalles = ordenesDetalleRepository.findByOrdenId(idOrden);
 
             for (OrdenesDetalle detalle : detalles) {
-                log.info("Reintegrando stock: Producto ID {}, Cantidad {}", detalle.getIdProducto(), detalle.getCantidad());
+                log.info("Reintegrando stock: Producto con id {}, cantidad {}", detalle.getIdProducto(), detalle.getCantidad());
         
                 inventarioClient.reintegrarStock(detalle.getIdProducto(), detalle.getCantidad());
             }
@@ -156,6 +156,6 @@ public class OrdenesService {
 
         orden.setEstadoOrden(nuevoEstado);
         ordenesRepository.save(orden);
-        log.info("Estado de la orden ID {} actualizado exitosamente en base de datos.", idOrden);
+        log.info("Estado de la orden con id {} actualizado exitosamente en la base de datos.", idOrden);
     }
 }
