@@ -42,11 +42,10 @@ public class OrdenesService {
 
         List<CarritoResponse> carrito;
         try {
-            // 1. Intentamos obtener el carrito de forma normal
             carrito = carritoClient.obtenerCarritoPorUsuario(request.getUsuarioId());
         } catch (Exception ex) {
             
-            log.warn("No se pudo obtener el carrito del usuario {}. Se asumirá como vacío. Motivo: {}", 
+            log.warn("No se pudo obtener el carrito del usuario {} por lo que se asumira como vacio por el motivo: {}", 
                     request.getUsuarioId(), ex.getMessage());
             carrito = List.of(); 
         }

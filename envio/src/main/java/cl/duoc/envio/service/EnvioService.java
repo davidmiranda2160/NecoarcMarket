@@ -42,9 +42,8 @@ public class EnvioService {
     
     envio.setOrdenId(ordenId);
     envio.setUsuarioId(request.getUsuarioId());
-    envio.setEstadoEnvio("Pendiente"); // Se mantiene tal como lo necesitas
+    envio.setEstadoEnvio("Pendiente"); 
     
-    // CORRECCIÓN: Generar el código con el formato de tu compañero y asignarlo a la entidad
     String codigoSeguimiento = String.format("TRACK-NECO-%03d", ordenId);
     envio.setCodigoSeguimiento(codigoSeguimiento); 
     
