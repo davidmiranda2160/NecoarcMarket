@@ -35,7 +35,7 @@ public class Envio {
     private String direccionDestino;
 
     @Column(name = "numero_seguimiento", nullable= false)
-    private String numeroSeguimiento;
+    private String codigoSeguimiento;
 
     @Column(name= "estado_envio", nullable= false)
     private String estadoEnvio;

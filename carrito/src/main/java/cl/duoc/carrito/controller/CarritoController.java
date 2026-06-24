@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cl.duoc.carrito.dto.ApiErrorResponse;
 import cl.duoc.carrito.dto.CarritoRequest;
 import cl.duoc.carrito.dto.CarritoResponse;
-import cl.duoc.carrito.dto.UsuarioResponse;
 import cl.duoc.carrito.service.CarritoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,18 +36,53 @@ public class CarritoController {
     private final CarritoService carritoService;
 
     @GetMapping("/usuario/{idUsuario}")
-     @Operation(summary= "Obtener carrito de un usuario", description= "Busca a un carrito mediante el id de un usuario")
+    @Operation(summary= "Obtener carrito de un usuario", description= "Busca a un carrito mediante el id de un usuario")
     @ApiResponses(value = {
         @ApiResponse( responseCode = "200", description= "El carrito del usuario ha sido encontrado",
             content= @Content(mediaType = "application/json",
-                schema = @Schema(implementation = UsuarioResponse.class),
+            schema = @Schema(implementation = CarritoResponse.class),
             examples= @ExampleObject(
             name = "El carrito de usuario ha sido encontrado",
             value = """
-                    
+                        {
+                            "id": 1,
+                            "cantidad": 1,
+                            "montoTotal": 25.99,
+                            "usuario": {
+                            "id": 1,
+                            "nombre": "Carlos",
+                            "appaterno": "Soto",
+                            "apmaterno": "Espinoza",
+                            "correo": "c.soto@gmail.com",
+                            "direccion": "Alameda 1020",
+                            "telefono": "+56944443333",
+                            "tipoUsuario": "Cliente"
+                            },
+                            "producto": {
+                            "id": 1,
+                            "nombrep": "Peluche de Neco-Arc",
+                            "descripcion": "Peluche oficial de 20cm, edición limitada Burunyuu.",
+                            "precio": 25.99
+                        }
+                    }
                     """
             ))),
-        @ApiResponse(responseCode= "404", description= "El carrito del usuario no fue encontrado")
+        @ApiResponse(responseCode= "404", description= "El carrito del usuario no fue encontrado",
+            content=  @Content(mediaType = "application/json",
+            schema= @Schema(implementation = ApiErrorResponse.class),
+            examples = @ExampleObject(
+            name = "Carrito del usuario no fue encontrado",
+            value = """        
+                        {
+                           "timestamp": "2026-06-23T18:21:02.1521734",
+                            "status": 404,
+                            "error": "Not Found",
+                            "message": "No se encontró el usuario con id: 0",
+                            "path": "/v1/carrito/usuario/0",
+                            "errors": null
+                        }
+                """
+                    ))),
     })
     public ResponseEntity<List<CarritoResponse>> obtenerCarritoPorUsuario(@PathVariable Long idUsuario) {
         log.info("GET /v1/carrito/usuario/{}", idUsuario);
@@ -60,8 +95,50 @@ public class CarritoController {
     @ApiResponses(value = {
         @ApiResponse( responseCode = "201", description= "El carrito fue creado",
             content= @Content(mediaType = "application/json",
-                schema = @Schema(implementation = UsuarioResponse.class))),
-        @ApiResponse(responseCode= "404", description= "El carrito no se pudo crear")
+                schema = @Schema(implementation = CarritoResponse.class),
+            examples= @ExampleObject(
+                name = "El carrito fue creado",
+                value= """   
+                        {
+                            "id": 5,
+                            "cantidad": 5,
+                            "montoTotal": 129.95,
+                            "usuario": {
+                            "id": 5,
+                            "nombre": "Estaban",
+                            "appaterno": "Quinto",
+                            "apmaterno": "Gonzales",
+                            "correo": "e.quinto@gmail.com",
+                            "direccion": "Calle falsa 123",
+                            "telefono": "+569778996777",
+                            "tipoUsuario": "Cliente"
+                            },
+                            "producto": {
+                            "id": 1,
+                            "nombrep": "Peluche de Neco-Arc",
+                            "descripcion": "Peluche oficial de 20cm, edición limitada Burunyuu.",
+                            "precio": 25.99
+                            }
+                        }
+                       """
+            ))),
+        @ApiResponse(responseCode= "400", description= "El carrito no se pudo crear",
+            content= @Content(mediaType = "application/json",
+            schema= @Schema(implementation = ApiErrorResponse.class),
+            examples = @ExampleObject(
+            name = "El carrito no se pudo crear",
+            value = """
+                    {
+                        "timestamp": "2026-06-23T18:53:20.6823579",
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "Error de validación en los datos enviados",
+                        "path": "/v1/carrito/5/1",
+                        "errors": [
+                        "cantidad: La cantidad mínima es 1"]
+                    }
+                    """
+                )))
     })
     public ResponseEntity<CarritoResponse> agregarProducto(@PathVariable Long idUsuario,
             @PathVariable Long idProducto,
@@ -75,31 +152,61 @@ public class CarritoController {
     @PutMapping("/{id}")
     @Operation(summary= "Actualizar a la cantidad de productos", description= "Actualiza la cantidad de productos de un carrito")
     @ApiResponses(value = {
-        @ApiResponse( responseCode = "200", description= "La cantidad fue actualizado correctamente",
+        @ApiResponse( responseCode = "200", description= "La cantidad fue actualizada correctamente",
             content= @Content(mediaType = "application/json",
-                schema = @Schema(implementation = UsuarioResponse.class))),
-        @ApiResponse(responseCode= "404", description= "El usuario no se pudo actualizar")
-    })
+            schema = @Schema(implementation = CarritoResponse.class),
+            examples= @ExampleObject(
+                name= "La cantidad fue actualizada correctamente",
+                value =(
+                """
+                    {        
+                        "id": 5,
+                        "cantidad": 3,
+                        "montoTotal": 77.97,
+                        "usuario": {
+                        "id": 5,
+                        "nombre": "Estaban",
+                        "appaterno": "Quinto",
+                        "apmaterno": "Gonzales",
+                        "correo": "e.quinto@gmail.com",
+                        "direccion": "Calle falsa 123",
+                        "telefono": "+569778996777",
+                        "tipoUsuario": "Cliente"
+                        },
+                        "producto": {
+                        "id": 1,
+                        "nombrep": "Peluche de Neco-Arc",
+                        "descripcion": "Peluche oficial de 20cm, edición limitada Burunyuu.",
+                        "precio": 25.99
+                        }
+                    }
+    """
+        )))),
+        @ApiResponse(responseCode = "400", description = "No se pudo actualizar, la cantidad tiene que ser mayor a 1",
+            content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = ApiErrorResponse.class),
+            examples = @ExampleObject(
+                name = "La cantidad minima es 1",
+                value = """    
+                            {
+                                "timestamp": "2026-06-23T19:14:51.8573133",
+                                "status": 400,
+                                "error": "Bad Request",
+                                "message": "Error de validación en los datos enviados",
+                                "path": "/v1/carrito/0",
+                                "errors": [
+                                "cantidad: La cantidad mínima es 1"
+                                ]
+                            }    
+                    """
+            )))
+        })
     public ResponseEntity<CarritoResponse> actualizarCarrito(@PathVariable Long id,
             @Valid @RequestBody CarritoRequest request) {
         log.info("PUT /v1/carrito/{} - Actualizando cantidades", id);
 
         CarritoResponse response = carritoService.actualizarCantidad(id, request.getCantidad());
         return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{id}")
-    @Operation(summary= "Elimina un producto del carrito", description= "Elimina un producto del carrito del usuario utilizando el id del producto")
-    @ApiResponses(value = {
-        @ApiResponse( responseCode = "204", description= "El producto fue eliminado",
-            content= @Content(mediaType = "application/json")),
-        @ApiResponse(responseCode= "404", description= "El producto no se pudo eliminar")
-    })
-    public ResponseEntity<Void> eliminarProductoPorId(@PathVariable Long id) {
-        log.info("DELETE /v1/carrito/{} - Eliminando ítem", id);
-
-        carritoService.eliminarProductoPorId(id);
-        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/usuario/{idUsuario}")

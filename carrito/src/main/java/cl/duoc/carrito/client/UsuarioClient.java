@@ -18,7 +18,7 @@ public class UsuarioClient {
     private final WebClient webClient;
 
     public UsuarioClient(WebClient.Builder webClientBuilder,
-            @Value("${services.usuario.baseUrl}") String baseUrl) {
+            @Value("${service.usuario.baseUrl}") String baseUrl) {
         this.webClient = webClientBuilder.baseUrl(baseUrl).build();
     }
 

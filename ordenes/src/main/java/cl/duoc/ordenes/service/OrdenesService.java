@@ -40,7 +40,17 @@ public class OrdenesService {
     public OrdenesResponse crearOrden(OrdenesRequest request) {
         log.info("Iniciando creación de orden descentralizada para usuario ID: {}", request.getUsuarioId());
 
-        List<CarritoResponse> carrito = carritoClient.obtenerCarritoPorUsuario(request.getUsuarioId());
+        List<CarritoResponse> carrito;
+        try {
+            // 1. Intentamos obtener el carrito de forma normal
+            carrito = carritoClient.obtenerCarritoPorUsuario(request.getUsuarioId());
+        } catch (Exception ex) {
+            
+            log.warn("No se pudo obtener el carrito del usuario {}. Se asumirá como vacío. Motivo: {}", 
+                    request.getUsuarioId(), ex.getMessage());
+            carrito = List.of(); 
+        }
+
         if (carrito == null || carrito.isEmpty()) {
             throw new NoSuchElementException("No hay productos en el carrito para generar una orden.");
         }
@@ -84,7 +94,15 @@ public class OrdenesService {
 
     public List<OrdenesResponse> obtenerPorUsuario(Long usuarioId) {
         log.info("Buscando lista de órdenes del usuario: {}", usuarioId);
-        return ordenesRepository.findByUsuarioId(usuarioId).stream()
+        
+        List<Ordenes> ordenes = ordenesRepository.findByUsuarioId(usuarioId);
+        
+        if (ordenes == null || ordenes.isEmpty()) {
+            log.warn("No se encontraron ordenes registradas para el usuario con id: {}", usuarioId);
+            throw new NoSuchElementException("No se encontraron ordenes para el usuario con id: " + usuarioId);
+        }
+
+        return ordenes.stream()
                 .map(orden -> {
                     List<OrdenesDetalle> detalles = ordenesDetalleRepository.findByOrdenId(orden.getId());
                     return ordenesMapper.toResponse(orden, detalles);
@@ -102,16 +120,23 @@ public class OrdenesService {
                 .collect(Collectors.toList());
     }
 
-    public List<OrdenesResponse> obtenerPorEstado(String estado) {
+   public List<OrdenesResponse> obtenerPorEstado(String estado) {
         log.info("Buscando ordenes por estado: {}", estado);
-        return ordenesRepository.findByEstadoOrden(estado).stream()
+        
+        List<Ordenes> ordenes = ordenesRepository.findByEstadoOrden(estado);
+        
+        if (ordenes == null || ordenes.isEmpty()) {
+            log.warn("No se encontraron órdenes en el sistema con el estado: {}", estado);
+            throw new NoSuchElementException("No se encontraron órdenes con el estado: " + estado);
+        }
+
+        return ordenes.stream()
                 .map(orden -> {
                     List<OrdenesDetalle> detalles = ordenesDetalleRepository.findByOrdenId(orden.getId());
                     return ordenesMapper.toResponse(orden, detalles);
                 })
                 .collect(Collectors.toList());
     }
-
     public void actualizarEstadoDesdePagos(Long idOrden, String nuevoEstado) {
         log.info("Cambiando estado de orden ID {} a: {}", idOrden, nuevoEstado);
 

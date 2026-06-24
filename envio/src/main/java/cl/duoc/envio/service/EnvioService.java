@@ -30,27 +30,31 @@ public class EnvioService {
     private final OrdenesClient ordenesClient;
 
     public EnvioResponse crearEnvio(EnvioRequest request) {
-        Long ordenId = request.getOrdenId();
-        
-        OrdenesResponse orden = ordenesClient.buscarOrdenPorId(ordenId);
-        if (orden == null) {
-            log.warn("No se pudo crear el envio: la orden con id {} no existe en el sistema", ordenId);
-            throw new NoSuchElementException("No se encontró la orden con id: " + ordenId); 
-        }
-        
-        Envio envio = envioMapper.fromRequest(request);
-        
-        envio.setOrdenId(ordenId);
-        envio.setUsuarioId(request.getUsuarioId());
-        envio.setEstadoEnvio("Pendiente");
-        envio.setNumeroSeguimiento("ENV-" + ordenId); 
-        envio.setFechaCreacion(LocalDateTime.now());
-        envio.setFechaEstimadaEntrega(LocalDate.now().plusDays(3)); 
-
-        Envio guardado = envioRepository.save(envio);
-        log.info("El envio fue creado exitosamente. id generado: {} - Tracking: {}", guardado.getId(), guardado.getNumeroSeguimiento());
-        return envioMapper.toResponse(guardado, orden);
+    Long ordenId = request.getOrdenId();
+    
+    OrdenesResponse orden = ordenesClient.buscarOrdenPorId(ordenId);
+    if (orden == null) {
+        log.warn("No se pudo crear el envio: la orden con id {} no existe en el sistema", ordenId);
+        throw new NoSuchElementException("No se encontró la orden con id: " + ordenId); 
     }
+    
+    Envio envio = envioMapper.fromRequest(request);
+    
+    envio.setOrdenId(ordenId);
+    envio.setUsuarioId(request.getUsuarioId());
+    envio.setEstadoEnvio("Pendiente"); // Se mantiene tal como lo necesitas
+    
+    // CORRECCIÓN: Generar el código con el formato de tu compañero y asignarlo a la entidad
+    String codigoSeguimiento = String.format("TRACK-NECO-%03d", ordenId);
+    envio.setCodigoSeguimiento(codigoSeguimiento); 
+    
+    envio.setFechaCreacion(LocalDateTime.now());
+    envio.setFechaEstimadaEntrega(LocalDate.now().plusDays(3)); 
+
+    Envio guardado = envioRepository.save(envio);
+    log.info("El envio fue creado exitosamente. id generado: {} - Tracking: {}", guardado.getId(), guardado.getCodigoSeguimiento());
+    return envioMapper.toResponse(guardado, orden);
+}
 
     public List<EnvioResponse> listarTodos() {
         log.info("Solicitando el listado de todos los envíos");

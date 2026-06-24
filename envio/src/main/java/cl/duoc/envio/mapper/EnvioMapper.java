@@ -28,7 +28,7 @@ public class EnvioMapper {
 
         return EnvioResponse.builder()
                 .id(envio.getId())
-                .numeroSeguimiento(envio.getNumeroSeguimiento())
+                .codigoSeguimiento(envio.getCodigoSeguimiento())
                 .estadoEnvio(envio.getEstadoEnvio())
                 .empresaTransporte(envio.getEmpresaTransporte())
                 .fechaEstimadaEntrega(envio.getFechaEstimadaEntrega())

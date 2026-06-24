@@ -138,18 +138,6 @@ public class CarritoService {
         return carritoMapper.toResponse(actualizado, userDto, prodDto);
     }
 
-    public void eliminarProductoPorId(Long id) {
-        log.info("Eliminando ítem de carrito ID: {}", id);
-
-        if (!carritoRepository.existsById(id)) {
-            log.error("Error al intentar eliminar: no existe el registro con ID: {}", id);
-            throw new NoSuchElementException("No se pudo eliminar el producto porque no existe en el carrito.");
-        }
-
-        carritoRepository.deleteById(id);
-        log.info("Ítem eliminado con éxito");
-    }
-
     public void vaciarCarrito(Long idUsuario) {
         log.info("Vaciando por completo el carrito del usuario ID: {}", idUsuario);
 

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class EnvioResponse {
     private Long id;
-    private String numeroSeguimiento;
+    private String codigoSeguimiento;
     private String estadoEnvio;
     private String empresaTransporte;
     private LocalDate fechaEstimadaEntrega;
